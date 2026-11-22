@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import emailjs from '@emailjs/browser';
 import { Mail, Phone, MessageCircle, Copy, Check, Send, ExternalLink } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { SectionHeading } from '../components/SectionHeading';
@@ -29,13 +30,32 @@ export const ContactSection = () => {
     setTimeout(() => setCopiedPhone(false), 2500);
   };
 
+  // دالة إرسال الرسالة باستخدام EmailJS
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    const mailtoUrl = 'mailto:' + encodeURIComponent(profileConfig.email) +
-      '?subject=' + encodeURIComponent(formState.subject || 'Portfolio Inquiry from ' + formState.name) +
-      '&body=' + encodeURIComponent('From: ' + formState.name + ' (' + formState.email + ')\n\n' + formState.message);
-    window.open(mailtoUrl, '_blank');
+    setSubmitted(false);
+
+    const serviceId = 'service_0v116rq';
+    const templateId = 'template_wter6be';
+    const publicKey = 'RM5nHRjjW_9z2ImhM';
+
+    const templateParams = {
+      from_name: formState.name,
+      from_email: formState.email,
+      title: formState.subject,
+      message: formState.message,
+    };
+
+    emailjs.send(serviceId, templateId, templateParams, publicKey)
+      .then((result) => {
+          console.log('SUCCESS!', result.text);
+          setSubmitted(true); // إظهار رسالة النجاح
+          setFormState({ name: '', email: '', subject: '', message: '' }); // تفريغ الخانات
+          setTimeout(() => setSubmitted(false), 5000); // إخفاء الرسالة بعد 5 ثواني
+      }, (error) => {
+          console.log('FAILED...', error.text);
+          alert(isRtl ? 'حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.' : 'Failed to send message. Please try again.');
+      });
   };
 
   return (
