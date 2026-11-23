@@ -1,7 +1,8 @@
 import React from 'react';
-import { Terminal, LineChart, Cpu, HardDrive, Wrench } from 'lucide-react';
+import { Terminal, LineChart, Cpu, HardDrive, Wrench, Sparkles } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { SectionHeading } from '../components/SectionHeading';
+import { getTechIcon } from '../components/TechIcons';
 
 export const SkillsSection = () => {
   const { t } = useLanguage();
@@ -46,9 +47,10 @@ export const SkillsSection = () => {
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '18px'
+                gap: '20px'
               }}
             >
+              {/* Category Header */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div
                   style={{
@@ -76,31 +78,93 @@ export const SkillsSection = () => {
                 </h3>
               </div>
 
-              {/* Skill Tags */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {cat.items.map((skill) => (
-                  <span
-                    key={skill}
-                    style={{
-                      padding: '6px 12px',
-                      borderRadius: 'var(--radius-sm)',
-                      background: 'var(--bg-primary)',
-                      border: '1px solid var(--border)',
-                      fontSize: '0.85rem',
-                      fontWeight: 500,
-                      color: 'var(--text-primary)',
-                      fontFamily: 'var(--font-mono)',
-                      transition: 'border-color var(--transition-fast)'
-                    }}
-                  >
-                    {skill}
-                  </span>
-                ))}
+              {/* Skills Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))',
+                  gap: '12px'
+                }}
+              >
+                {cat.items.map((skill) => {
+                  const techIcon = getTechIcon(skill, 30);
+                  if (techIcon) {
+                    return (
+                      <div
+                        key={skill}
+                        className="tech-tile"
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          padding: '12px 6px',
+                          background: 'var(--bg-primary)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius-md)',
+                          textAlign: 'center',
+                          cursor: 'default',
+                          transition: 'all var(--transition-normal)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '32px' }}>
+                          {techIcon}
+                        </div>
+                        <span
+                          style={{
+                            fontSize: '0.78rem',
+                            fontWeight: 600,
+                            color: 'var(--text-primary)',
+                            fontFamily: 'var(--font-mono)',
+                            lineHeight: 1.2
+                          }}
+                        >
+                          {skill}
+                        </span>
+                      </div>
+                    );
+                  }
+
+                  // Non-tool conceptual skills (e.g. Classification, Feature Engineering)
+                  return (
+                    <div
+                      key={skill}
+                      className="tech-tile"
+                      style={{
+                        gridColumn: 'span 2',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '10px 12px',
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        color: 'var(--text-secondary)',
+                        fontFamily: 'var(--font-mono)',
+                        transition: 'all var(--transition-normal)'
+                      }}
+                    >
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)', flexShrink: 0 }} />
+                      <span>{skill}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      <style>{`
+        .tech-tile:hover {
+          border-color: var(--accent) !important;
+          transform: translateY(-3px) scale(1.02);
+          box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.15);
+        }
+      `}</style>
     </section>
   );
 };

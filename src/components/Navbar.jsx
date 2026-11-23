@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Sun, Moon, Globe, Menu, X } from 'lucide-react';
+import { Sun, Moon, Globe, Menu, X, Mail } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { Github, Linkedin } from './SocialIcons';
+import { profileConfig } from '../data/profileData';
 
 export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
@@ -24,7 +26,7 @@ export const Navbar = () => {
   useEffect(() => {
     if (location.pathname !== '/') return;
 
-    const sections = ['hero', 'about', 'what-i-do', 'skills', 'approach', 'projects', 'journey', 'contact'];
+    const sections = ['hero', 'about', 'skills', 'soft-skills', 'projects', 'certificates', 'journey', 'contact'];
     const observers = [];
 
     sections.forEach((id) => {
@@ -33,7 +35,7 @@ export const Navbar = () => {
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            setActiveSection(id);
+            setActiveSection(id === 'soft-skills' ? 'skills' : id);
           }
         },
         { threshold: 0.2, rootMargin: '-70px 0px -40% 0px' }
@@ -50,8 +52,9 @@ export const Navbar = () => {
     { id: 'about', label: t.nav.about },
     { id: 'skills', label: t.nav.skills },
     { id: 'projects', label: t.nav.projects },
+    { id: 'certificates', label: t.nav.certificates },
     { id: 'journey', label: t.nav.journey },
-    { id: 'contact', label: t.nav.contact }
+    { id: 'contact', label: t.nav.contact, isButton: true }
   ];
 
   const handleNavClick = (id) => {
@@ -91,45 +94,92 @@ export const Navbar = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          height: '72px'
+          height: '72px',
+          gap: '16px'
         }}
       >
-        {/* Brand Logo */}
+        {/* Brand Personal Logo from public/logo.png */}
         <Link
           to="/"
           onClick={() => handleNavClick('hero')}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '6px',
+            gap: '10px',
             textDecoration: 'none'
           }}
           aria-label="Abdo Elsayed Home"
         >
+          <img
+            src="/logo.png"
+            alt="Abdo Elsayed Logo"
+            style={{
+              width: '38px',
+              height: '38px',
+              objectFit: 'cover',
+              borderRadius: '9px',
+              border: '1px solid rgba(6, 182, 212, 0.3)',
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.25)'
+            }}
+          />
           <span
             style={{
               fontFamily: 'var(--font-mono)',
               fontWeight: 800,
-              fontSize: '1.45rem',
+              fontSize: '1.25rem',
               color: 'var(--text-primary)',
-              letterSpacing: '-0.03em'
+              letterSpacing: '-0.02em',
+              display: 'inline-block'
             }}
           >
-            AE<span style={{ color: 'var(--accent)' }}>.</span>
+            Abdo Elsayed<span style={{ color: 'var(--accent)' }}>.</span>
           </span>
         </Link>
 
         {/* Desktop Nav Links */}
         <nav
           style={{
-            display: 'none',
             alignItems: 'center',
-            gap: '28px'
+            gap: '22px'
           }}
           className="desktop-nav"
         >
           {navLinks.map((link) => {
             const isActive = location.pathname === '/' && activeSection === link.id;
+
+            if (link.isButton) {
+              return (
+                <button
+                  key={link.id}
+                  onClick={() => handleNavClick(link.id)}
+                  className="nav-contact-btn"
+                  style={{
+                    background: isActive ? 'var(--badge-bg)' : 'transparent',
+                    border: '1.5px solid var(--accent)',
+                    color: 'var(--accent)',
+                    fontWeight: 600,
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    padding: '7px 16px',
+                    borderRadius: 'var(--radius-full)',
+                    transition: 'all var(--transition-fast)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--accent)';
+                    e.currentTarget.style.color = '#FFFFFF';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-accent)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = isActive ? 'var(--badge-bg)' : 'transparent';
+                    e.currentTarget.style.color = 'var(--accent)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  {link.label}
+                </button>
+              );
+            }
+
             return (
               <button
                 key={link.id}
@@ -139,7 +189,7 @@ export const Navbar = () => {
                   border: 'none',
                   color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
                   fontWeight: isActive ? 600 : 500,
-                  fontSize: '0.925rem',
+                  fontSize: '0.9rem',
                   cursor: 'pointer',
                   padding: '6px 0',
                   position: 'relative',
@@ -165,17 +215,56 @@ export const Navbar = () => {
           })}
         </nav>
 
-        {/* Controls: Theme & Language & Mobile Menu Button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Toolbar: Social Contact Icons + Language Switcher + Theme Switcher */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Top Navbar Contact Icons (GitHub, LinkedIn, Email) */}
+          <div className="nav-socials" style={{ alignItems: 'center', gap: '6px' }}>
+            <a
+              href={profileConfig.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="icon-btn"
+              style={{ width: '34px', height: '34px' }}
+              title="GitHub Profile"
+              aria-label="GitHub Profile"
+            >
+              <Github size={15} />
+            </a>
+
+            <a
+              href={profileConfig.linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="icon-btn"
+              style={{ width: '34px', height: '34px' }}
+              title="LinkedIn Profile"
+              aria-label="LinkedIn Profile"
+            >
+              <Linkedin size={15} />
+            </a>
+
+            <a
+              href={'mailto:' + profileConfig.email}
+              className="icon-btn"
+              style={{ width: '34px', height: '34px' }}
+              title="Send Email"
+              aria-label="Send Direct Email"
+            >
+              <Mail size={15} />
+            </a>
+          </div>
+
+          <span className="nav-divider" style={{ width: '1px', height: '22px', backgroundColor: 'var(--border)', marginInline: '4px' }} />
+
           {/* Language Switcher */}
           <button
             onClick={toggleLang}
             className="icon-btn"
-            style={{ width: 'auto', paddingInline: '12px', gap: '6px', fontSize: '0.825rem', fontWeight: 600 }}
+            style={{ width: 'auto', paddingInline: '10px', height: '36px', gap: '5px', fontSize: '0.8rem', fontWeight: 600 }}
             title={t.nav.switchLang}
             aria-label={t.nav.switchLang}
           >
-            <Globe size={15} />
+            <Globe size={14} />
             <span>{lang === 'en' ? 'AR' : 'EN'}</span>
           </button>
 
@@ -183,10 +272,11 @@ export const Navbar = () => {
           <button
             onClick={toggleTheme}
             className="icon-btn"
+            style={{ width: '36px', height: '36px' }}
             title={t.nav.switchTheme}
             aria-label={t.nav.switchTheme}
           >
-            {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
           {/* Mobile Menu Toggle */}
@@ -194,9 +284,9 @@ export const Navbar = () => {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="icon-btn mobile-toggle"
             aria-label={mobileMenuOpen ? t.nav.closeMenu : t.nav.menu}
-            style={{ display: 'none' }}
+            style={{ width: '36px', height: '36px' }}
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </div>
@@ -214,7 +304,7 @@ export const Navbar = () => {
             padding: '24px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px',
+            gap: '14px',
             boxShadow: 'var(--shadow-lg)'
           }}
         >
@@ -223,23 +313,78 @@ export const Navbar = () => {
               key={link.id}
               onClick={() => handleNavClick(link.id)}
               style={{
-                background: 'none',
-                border: 'none',
+                background: link.isButton ? 'var(--badge-bg)' : 'none',
+                border: link.isButton ? '1px solid var(--accent)' : 'none',
+                borderRadius: link.isButton ? 'var(--radius-md)' : '0',
                 textAlign: isRtl ? 'right' : 'left',
-                color: activeSection === link.id ? 'var(--accent)' : 'var(--text-primary)',
-                fontSize: '1.05rem',
+                color: activeSection === link.id || link.isButton ? 'var(--accent)' : 'var(--text-primary)',
+                fontSize: '1rem',
                 fontWeight: 600,
-                padding: '8px 0',
+                padding: '10px 14px',
                 cursor: 'pointer'
               }}
             >
               {link.label}
             </button>
           ))}
+
+          {/* Mobile Socials */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '12px',
+              paddingTop: '14px',
+              borderTop: '1px solid var(--border)',
+              marginTop: '6px'
+            }}
+          >
+            <a
+              href={profileConfig.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="icon-btn"
+              aria-label="GitHub"
+            >
+              <Github size={17} />
+            </a>
+            <a
+              href={profileConfig.linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="icon-btn"
+              aria-label="LinkedIn"
+            >
+              <Linkedin size={17} />
+            </a>
+            <a
+              href={'mailto:' + profileConfig.email}
+              className="icon-btn"
+              aria-label="Email"
+            >
+              <Mail size={17} />
+            </a>
+          </div>
         </div>
       )}
 
-      <style>{'\n@media (min-width: 860px) {\n  .desktop-nav {\n    display: flex !important;\n  }\n}\n@media (max-width: 859px) {\n  .mobile-toggle {\n    display: inline-flex !important;\n  }\n}\n'}</style>
+      <style>{`
+        @media (min-width: 980px) {
+          .desktop-nav {
+            display: flex !important;
+          }
+          .nav-socials {
+            display: flex !important;
+          }
+          .nav-divider {
+            display: block !important;
+          }
+        }
+        @media (max-width: 979px) {
+          .mobile-toggle {
+            display: inline-flex !important;
+          }
+        }
+      `}</style>
     </header>
   );
 };

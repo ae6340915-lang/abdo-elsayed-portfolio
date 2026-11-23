@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { Navbar } from './components/Navbar';
+import { IntroScreen } from './components/IntroScreen';
 import { Footer } from './components/Footer';
 import { ScrollToTop } from './components/ScrollToTop';
 import { HomePage } from './pages/HomePage';
@@ -14,6 +15,7 @@ export function App() {
     <ThemeProvider>
       <LanguageProvider>
         <BrowserRouter>
+          <IntroScreen />
           <ScrollToTop />
           <Navbar />
           <Routes>

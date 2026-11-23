@@ -6,6 +6,7 @@ export const en = {
     skills: "Skills",
     approach: "Approach",
     projects: "Projects",
+    certificates: "Certificates",
     journey: "Journey",
     contact: "Contact",
     menu: "Menu",
@@ -99,9 +100,68 @@ export const en = {
       {
         id: "tools",
         title: "Tools & Environment",
-        items: ["Git", "GitHub", "Jupyter Notebook", "MongoDB"]
+        items: ["Git", "GitHub", "Linux", "Docker", "Jupyter Notebook", "MongoDB"]
       }
     ]
+  },
+  softSkills: {
+    sectionTag: "CORE ATTRIBUTES",
+    title: "Soft Skills",
+    subtitle: "Essential cognitive, interpersonal, and analytical competencies that empower disciplined problem solving, collaboration, and continuous engineering growth.",
+    items: [
+      {
+        id: "problem-solving",
+        title: "Problem Solving",
+        description: "Deconstructing complex data challenges into structured, testable, and solvable engineering steps."
+      },
+      {
+        id: "analytical-thinking",
+        title: "Analytical Thinking",
+        description: "Evaluating patterns objectively, rigorously questioning assumptions, and deriving data-backed insights."
+      },
+      {
+        id: "continuous-learning",
+        title: "Continuous Learning",
+        description: "Staying curious, reading ML papers, and turning emerging methodologies into practical capabilities."
+      },
+      {
+        id: "adaptability",
+        title: "Adaptability",
+        description: "Embracing new workflows, evolving requirements, and iterating solutions based on experimental findings."
+      },
+      {
+        id: "teamwork",
+        title: "Teamwork & Collaboration",
+        description: "Collaborating seamlessly with cross-functional peers, sharing knowledge, and contributing to collective goals."
+      },
+      {
+        id: "time-management",
+        title: "Time Management",
+        description: "Prioritizing milestones, estimating pipelines realistically, and delivering reliable solutions on schedule."
+      },
+      {
+        id: "attention-to-detail",
+        title: "Attention to Detail",
+        description: "Ensuring data integrity, rigorous edge-case validation, and precision throughout model evaluation."
+      },
+      {
+        id: "communication",
+        title: "Communication",
+        description: "Translating nuanced statistical metrics and architectural concepts into clear, actionable understanding."
+      }
+    ]
+  },
+  certificates: {
+    sectionTag: "CREDENTIALS & ACHIEVEMENTS",
+    title: "Certifications",
+    subtitle: "Official industry credentials validating practical competencies in Big Data architectures, distributed processing, and engineering pipelines.",
+    viewCertificate: "View Certificate",
+    verifiedBadge: "Verified Credential",
+    issuingOrg: "Issuing Organization",
+    issueDate: "Issue Date",
+    duration: "Duration & Score",
+    keyCompetencies: "Validated Competencies",
+    closeModal: "Close Preview"
   },
   approach: {
     sectionTag: "METHODOLOGY",
