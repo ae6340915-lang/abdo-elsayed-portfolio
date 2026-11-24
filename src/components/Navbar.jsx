@@ -26,7 +26,8 @@ export const Navbar = () => {
   useEffect(() => {
     if (location.pathname !== '/') return;
 
-    const sections = ['hero', 'about', 'skills', 'soft-skills', 'projects', 'certificates', 'journey', 'contact', 'freelance'];
+    // 1. تم إضافة 'services' هنا
+    const sections = ['hero', 'about', 'skills', 'soft-skills', 'projects', 'services', 'certificates', 'journey', 'contact', 'freelance'];
     const observers = [];
 
     sections.forEach((id) => {
@@ -58,6 +59,8 @@ export const Navbar = () => {
     { id: 'about', label: t.nav.about },
     { id: 'skills', label: t.nav.skills },
     { id: 'projects', label: t.nav.projects },
+    // 2. تم إضافة قسم الخدمات هنا
+    { id: 'services', label: t.nav.services || 'Services' },
     { id: 'certificates', label: t.nav.certificates },
     { id: 'journey', label: t.nav.journey },
     { id: 'contact', label: t.nav.contact, isButton: true }

@@ -9,6 +9,7 @@ import { ProjectsSection } from '../sections/ProjectsSection';
 import { CertificatesSection } from '../sections/CertificatesSection';
 import { JourneySection } from '../sections/JourneySection';
 import { GithubSection } from '../sections/GithubSection';
+import { ServicesSection } from '../sections/ServicesSection'; 
 import { ContactSection } from '../sections/ContactSection';
 import { FreelanceSection } from '../sections/FreelanceSection';
 
@@ -25,6 +26,10 @@ export const HomePage = () => {
       <CertificatesSection />
       <JourneySection />
       <GithubSection />
+      
+     
+      <ServicesSection /> 
+      
       <ContactSection />
       <FreelanceSection />
     </main>

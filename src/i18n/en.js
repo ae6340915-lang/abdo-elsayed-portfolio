@@ -2,7 +2,8 @@ export const en = {
   nav: {
     home: "Home",
     about: "About",
-    services: "What I Do",
+    whatIDo: "What I Do", // ← تم التعديل
+    services: "Services", // ← تمت الإضافة
     skills: "Skills",
     approach: "Approach",
     projects: "Projects",
@@ -315,6 +316,58 @@ export const en = {
       }
     }
   },
+  // ==========================================
+  // قسم الخدمات الجديد (Services)
+  // ==========================================
+  servicesData: {
+    sectionTag: "SERVICES",
+    title: "Services I Offer",
+    subtitle: "Professional solutions for Data Analysis and Machine Learning.",
+    packagesTitle: "Service Packages",
+    discussBtn: "Contact Me",
+    problem: "Problem:",
+    result: "Result:",
+    packages: [
+      { name: "Basic", desc: "Small data cleaning or simple analysis tasks." },
+      { name: "Standard", desc: "Detailed analysis, visualization, and reporting." },
+      { name: "Advanced", desc: "End-to-end data analysis or traditional machine learning workflows." }
+    ],
+    list: [
+      {
+        id: 1,
+        title: "Data Analysis & Visualization",
+        desc: "Analyze datasets, discover trends, identify patterns, and create meaningful visualizations.",
+        prob: "Raw data is difficult to understand and lacks actionable insights.",
+        res: "Clear insights that support better decision-making.",
+        tech: ["Python", "Pandas", "NumPy", "Matplotlib", "Seaborn"]
+      },
+      {
+        id: 2,
+        title: "Data Cleaning & Preprocessing",
+        desc: "Clean datasets, handle missing values, remove duplicates, detect inconsistencies, and prepare data for analysis.",
+        prob: "Poor-quality data negatively affects analysis and model performance.",
+        res: "Clean, structured, and analysis-ready datasets.",
+        tech: ["Python", "Pandas", "NumPy"]
+      },
+      {
+        id: 3,
+        title: "Machine Learning & Predictive Modeling",
+        desc: "Build, train, and evaluate traditional machine learning models for classification and regression tasks.",
+        prob: "Businesses need to discover patterns and predict outcomes using historical data.",
+        res: "Predictive models and meaningful evaluation results.",
+        tech: ["Python", "Scikit-learn", "Pandas"]
+      },
+      {
+        id: 4,
+        title: "SQL & Database Analysis",
+        desc: "Query databases, extract useful information, analyze structured data, and generate insights.",
+        prob: "Valuable information is stored in databases but is difficult to retrieve and interpret.",
+        res: "Organized data analysis and useful business insights.",
+        tech: ["SQL", "MySQL"]
+      }
+    ]
+  },
+  // ==========================================
   footer: {
     title: "Aspiring Data & Machine Learning Engineer",
     tagline: "Exploring Data. Building Models. Solving Problems.",
