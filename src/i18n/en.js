@@ -283,6 +283,38 @@ export const en = {
     directEmailFallback: "Direct Email Fallback",
     openClient: "Open in Mail Client"
   },
+  freelance: {
+    sectionTag: "FREELANCE & COLLABORATION",
+    title: "Find Me on Freelance Platforms",
+    subtitle: "Explore my profiles and connect with me for data, Python, and machine learning projects.",
+    visitProfile: "Visit Profile",
+    platforms: {
+      khamsat: {
+        name: "Khamsat",
+        subName: "خمسات",
+        role: "Micro Services & Scripts",
+        description: "Specialized services for tabular data cleaning, web scraping, and automated Python processing tasks."
+      },
+      mostaql: {
+        name: "Mostaql",
+        subName: "مستقل",
+        role: "Full Data Projects",
+        description: "Comprehensive data engineering pipelines, custom machine learning models, and interactive analytics."
+      },
+      kafiil: {
+        name: "Kafiil",
+        subName: "كفيل",
+        role: "Data Solutions",
+        description: "Exploratory data analysis, predictive statistical models, and structured data transformation."
+      },
+      nafezly: {
+        name: "Nafezly",
+        subName: "نفذلي",
+        role: "Python & Automation",
+        description: "Custom Python scripting, workflow automation, and algorithmic data processing contracts."
+      }
+    }
+  },
   footer: {
     title: "Aspiring Data & Machine Learning Engineer",
     tagline: "Exploring Data. Building Models. Solving Problems.",

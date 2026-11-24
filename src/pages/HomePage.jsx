@@ -10,6 +10,7 @@ import { CertificatesSection } from '../sections/CertificatesSection';
 import { JourneySection } from '../sections/JourneySection';
 import { GithubSection } from '../sections/GithubSection';
 import { ContactSection } from '../sections/ContactSection';
+import { FreelanceSection } from '../sections/FreelanceSection';
 
 export const HomePage = () => {
   return (
@@ -25,6 +26,7 @@ export const HomePage = () => {
       <JourneySection />
       <GithubSection />
       <ContactSection />
+      <FreelanceSection />
     </main>
   );
 };

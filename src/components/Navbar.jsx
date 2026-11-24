@@ -26,7 +26,7 @@ export const Navbar = () => {
   useEffect(() => {
     if (location.pathname !== '/') return;
 
-    const sections = ['hero', 'about', 'skills', 'soft-skills', 'projects', 'certificates', 'journey', 'contact'];
+    const sections = ['hero', 'about', 'skills', 'soft-skills', 'projects', 'certificates', 'journey', 'contact', 'freelance'];
     const observers = [];
 
     sections.forEach((id) => {
@@ -35,7 +35,13 @@ export const Navbar = () => {
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            setActiveSection(id === 'soft-skills' ? 'skills' : id);
+            if (id === 'soft-skills') {
+              setActiveSection('skills');
+            } else if (id === 'freelance') {
+              setActiveSection('contact');
+            } else {
+              setActiveSection(id);
+            }
           }
         },
         { threshold: 0.2, rootMargin: '-70px 0px -40% 0px' }
