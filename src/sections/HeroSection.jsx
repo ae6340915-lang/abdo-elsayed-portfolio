@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowDown, ArrowUpRight, Sparkles } from 'lucide-react';
+import { ArrowDown, MapPin, GraduationCap } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { HeroNetworkVisual } from '../components/DataVisuals';
 
@@ -34,8 +34,9 @@ export const HeroSection = () => {
           }}
         >
           {/* Left Column: Brand & Copy */}
-          <div style={{ maxWidth: '580px' }}>
-            {/* Status Indicator */}
+          <div style={{ maxWidth: '600px' }}>
+
+            {/* Status Badge */}
             <div
               style={{
                 display: 'inline-flex',
@@ -45,7 +46,7 @@ export const HeroSection = () => {
                 background: 'var(--bg-card)',
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--radius-full)',
-                marginBottom: '20px',
+                marginBottom: '24px',
                 boxShadow: 'var(--shadow-sm)'
               }}
             >
@@ -61,79 +62,146 @@ export const HeroSection = () => {
               </span>
             </div>
 
-            {/* Small Label */}
+            {/* Label */}
             <div
               style={{
-                fontSize: '0.85rem',
+                fontSize: '0.78rem',
                 fontWeight: 700,
                 color: 'var(--accent)',
-                letterSpacing: '0.1em',
+                letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                marginBottom: '14px',
+                marginBottom: '10px',
                 fontFamily: 'var(--font-mono)'
               }}
             >
               {t.hero.label}
             </div>
 
-            {/* Main Headline */}
+            {/* Name */}
             <h1
               style={{
-                fontSize: 'clamp(2.35rem, 4.8vw, 3.8rem)',
+                fontSize: 'clamp(2.4rem, 5vw, 3.8rem)',
                 fontWeight: 800,
                 color: 'var(--text-primary)',
                 letterSpacing: '-0.03em',
-                lineHeight: 1.15,
+                lineHeight: 1.1,
+                marginBottom: '10px'
+              }}
+            >
+              {t.hero.name}
+            </h1>
+
+            {/* Professional Title */}
+            <div
+              style={{
+                fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+                color: 'var(--accent)',
+                fontWeight: 600,
+                marginBottom: '16px',
+                fontFamily: 'var(--font-mono)',
+                letterSpacing: '0.02em'
+              }}
+            >
+              {t.hero.title}
+            </div>
+
+            {/* University / Location Row */}
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '12px',
                 marginBottom: '20px'
               }}
             >
-              <span>{t.hero.headlineLine1}</span>
-              <br />
-              <span style={{ color: 'var(--accent)' }}>{t.hero.headlineLine2}</span>
-              <br />
-              <span>{t.hero.headlineLine3}</span>
-            </h1>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  fontSize: '0.82rem',
+                  color: 'var(--text-secondary)',
+                  fontWeight: 500
+                }}
+              >
+                <GraduationCap size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                {t.hero.university}
+              </span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  fontSize: '0.82rem',
+                  color: 'var(--text-secondary)',
+                  fontWeight: 500
+                }}
+              >
+                <MapPin size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                {isRtl ? 'الزقازيق، مصر' : 'Zagazig, Egypt'}
+              </span>
+            </div>
 
-            {/* Supporting Paragraph */}
+            {/* Description */}
             <p
               style={{
-                fontSize: 'clamp(1rem, 1.8vw, 1.15rem)',
+                fontSize: 'clamp(0.95rem, 1.6vw, 1.1rem)',
                 color: 'var(--text-secondary)',
-                lineHeight: 1.65,
-                marginBottom: '32px'
+                lineHeight: 1.7,
+                marginBottom: '28px',
+                maxWidth: '540px'
               }}
             >
               {t.hero.paragraph}
             </p>
 
-            {/* Buttons */}
+            {/* Skill Chips */}
             <div
               style={{
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: '14px',
-                alignItems: 'center'
+                gap: '8px',
+                marginBottom: '36px'
               }}
             >
-              <button
-                onClick={() => scrollTo('projects')}
-                className="btn btn-primary"
-              >
-                <span>{t.hero.exploreWork}</span>
-                <ArrowDown size={16} />
-              </button>
-
-              <button
-                onClick={() => scrollTo('contact')}
-                className="btn btn-secondary"
-              >
-                <span>{t.hero.letsConnect}</span>
-                <ArrowUpRight
-                  size={16}
-                  style={{ transform: isRtl ? 'scaleX(-1)' : 'none' }}
-                />
-              </button>
+              {t.hero.skills && t.hero.skills.map((skill) => (
+                <span
+                  key={skill}
+                  style={{
+                    display: 'inline-block',
+                    padding: '4px 12px',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    color: 'var(--text-secondary)',
+                    fontFamily: 'var(--font-mono)',
+                    letterSpacing: '0.03em',
+                    transition: 'border-color 0.2s, color 0.2s'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = 'var(--accent)';
+                    e.currentTarget.style.color = 'var(--accent)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                  }}
+                >
+                  {skill}
+                </span>
+              ))}
             </div>
+
+            {/* Single CTA Button */}
+            <button
+              onClick={() => scrollTo('projects')}
+              className="btn btn-primary"
+            >
+              <span>{t.hero.exploreWork}</span>
+              <ArrowDown size={16} />
+            </button>
           </div>
 
           {/* Right Column: Custom Data Visual */}

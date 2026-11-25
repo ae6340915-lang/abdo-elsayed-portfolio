@@ -16,23 +16,27 @@ export const en = {
     switchLang: "العربية"
   },
   hero: {
-    label: "DATA & MACHINE LEARNING",
-    headlineLine1: "Exploring Data.",
-    headlineLine2: "Building Models.",
-    headlineLine3: "Solving Problems.",
-    paragraph: "I explore data, uncover patterns, and build machine learning models to better understand problems and develop data-driven solutions.",
-    exploreWork: "Explore My Work",
+    label: "DATA ANALYSIS & MACHINE LEARNING",
+    name: "Abdelrahman Elsayed",
+    title: "Data Analyst | Machine Learning Enthusiast",
+    headlineLine1: "DATA ANALYSIS &",
+    headlineLine2: "MACHINE LEARNING",
+    headlineLine3: "",
+    paragraph: "Transforming raw data into meaningful insights through data analysis, visualization, and machine learning. Interested in solving real-world problems, discovering patterns, preparing clean datasets, and building data-driven solutions.",
+    exploreWork: "Explore My Projects",
     letsConnect: "Let's Connect",
-    statusBadge: "Currently focused on Data Analysis & Machine Learning"
+    statusBadge: "Currently focused on Data Analysis & Machine Learning",
+    university: "Zagazig University · Faculty of Computers & Information · Information Systems",
+    skills: ["Python", "SQL", "Pandas & NumPy", "Data Cleaning", "EDA", "Data Visualization", "Machine Learning", "Scikit-learn", "Power BI", "Tableau", "Git & GitHub"]
   },
   about: {
     sectionTag: "ABOUT ME",
     title: "Beyond the Data",
-    p1: "I'm an aspiring Data & Machine Learning Engineer interested in understanding data, discovering patterns, and solving problems through analytical thinking.",
+    p1: "I'm Abdelrahman Elsayed, a Data Analyst and Machine Learning enthusiast studying Information Systems at the Faculty of Computers and Information, Zagazig University, Egypt.",
     p2: "I enjoy exploring datasets, investigating relationships between features, experimenting with machine learning algorithms, and understanding the results behind each model.",
-    p3: "For me, machine learning is not only about achieving a high score. It is also about understanding the problem, evaluating different approaches, analyzing errors, and interpreting results.",
-    p4: "I'm continuously developing my skills through hands-on projects, experimentation, and learning how technologies work.",
-    quote: "True machine learning is not merely optimization — it is the disciplined pursuit of understanding the underlying system.",
+    p3: "For me, data work is not only about achieving a high score — it is about understanding the problem, evaluating different approaches, analyzing errors, and interpreting results in a meaningful way.",
+    p4: "I'm continuously developing my skills through hands-on projects, real data analysis workflows, and learning how data technologies work at a deeper level.",
+    quote: "True data science is not merely running algorithms — it is the disciplined pursuit of understanding the underlying patterns in reality.",
     characteristicsTitle: "Core Characteristics",
     characteristics: [
       "Analytical thinking & structured problem solving",
@@ -369,8 +373,8 @@ export const en = {
   },
   // ==========================================
   footer: {
-    title: "Aspiring Data & Machine Learning Engineer",
-    tagline: "Exploring Data. Building Models. Solving Problems.",
+    title: "Data Analyst | Machine Learning Enthusiast",
+    tagline: "Transforming raw data into meaningful insights.",
     allRightsReserved: "All rights reserved.",
     backToTop: "Back to Top"
   }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Sun, Moon, Globe, Menu, X, Mail } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
@@ -14,6 +14,9 @@ export const Navbar = () => {
   const [activeSection, setActiveSection] = useState('hero');
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // متغير عشان نمنع المراقب من التدخل أثناء التمرير
+  const isScrolling = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,7 +29,6 @@ export const Navbar = () => {
   useEffect(() => {
     if (location.pathname !== '/') return;
 
-    // 1. تم إضافة 'services' هنا
     const sections = ['hero', 'about', 'skills', 'soft-skills', 'projects', 'services', 'certificates', 'journey', 'contact', 'freelance'];
     const observers = [];
 
@@ -35,7 +37,8 @@ export const Navbar = () => {
       if (!el) return;
       const observer = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting) {
+          // بنمنع المراقب من التغيير لو إحنا بنعمل تمرير
+          if (entry.isIntersecting && !isScrolling.current) {
             if (id === 'soft-skills') {
               setActiveSection('skills');
             } else if (id === 'freelance') {
@@ -59,7 +62,6 @@ export const Navbar = () => {
     { id: 'about', label: t.nav.about },
     { id: 'skills', label: t.nav.skills },
     { id: 'projects', label: t.nav.projects },
-    // 2. تم إضافة قسم الخدمات هنا
     { id: 'services', label: t.nav.services || 'Services' },
     { id: 'certificates', label: t.nav.certificates },
     { id: 'journey', label: t.nav.journey },
@@ -68,17 +70,24 @@ export const Navbar = () => {
 
   const handleNavClick = (id) => {
     setMobileMenuOpen(false);
+    isScrolling.current = true; // فعلنا التمرير عشان نوقف المراقب
+
     if (location.pathname !== '/') {
       navigate('/#' + id);
       setTimeout(() => {
         const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+        // بعد ما التمرير يخلص، نرجع نشغل المراقب تاني
+        setTimeout(() => { isScrolling.current = false; }, 1000);
       }, 100);
     } else {
       const el = document.getElementById(id);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
       }
+      setTimeout(() => { isScrolling.current = false; }, 1000);
     }
   };
 
@@ -141,7 +150,7 @@ export const Navbar = () => {
               display: 'inline-block'
             }}
           >
-            Abdo Elsayed<span style={{ color: 'var(--accent)' }}>.</span>
+            Abdelrahman Elsayed<span style={{ color: 'var(--accent)' }}>.</span>
           </span>
         </Link>
 

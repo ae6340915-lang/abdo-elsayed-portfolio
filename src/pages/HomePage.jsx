@@ -4,12 +4,12 @@ import { AboutSection } from '../sections/AboutSection';
 import { WhatIDoSection } from '../sections/WhatIDoSection';
 import { SkillsSection } from '../sections/SkillsSection';
 import { SoftSkillsSection } from '../sections/SoftSkillsSection';
+import { ServicesSection } from '../sections/ServicesSection';
 import { ApproachSection } from '../sections/ApproachSection';
 import { ProjectsSection } from '../sections/ProjectsSection';
 import { CertificatesSection } from '../sections/CertificatesSection';
 import { JourneySection } from '../sections/JourneySection';
 import { GithubSection } from '../sections/GithubSection';
-import { ServicesSection } from '../sections/ServicesSection'; 
 import { ContactSection } from '../sections/ContactSection';
 import { FreelanceSection } from '../sections/FreelanceSection';
 
@@ -21,15 +21,12 @@ export const HomePage = () => {
       <WhatIDoSection />
       <SkillsSection />
       <SoftSkillsSection />
+      <ServicesSection />
       <ApproachSection />
       <ProjectsSection />
       <CertificatesSection />
       <JourneySection />
       <GithubSection />
-      
-     
-      <ServicesSection /> 
-      
       <ContactSection />
       <FreelanceSection />
     </main>
