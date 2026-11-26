@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Filter } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 import { SectionHeading } from '../components/SectionHeading';
 import { ProjectCard } from '../components/ProjectCard';
 import { projectsData } from '../data/projectsData';
@@ -13,18 +13,20 @@ export const ProjectsPage = () => {
   const filters = [
     { id: 'ALL', labelEn: 'All Projects', labelAr: 'جميع المشاريع' },
     { id: 'ML', labelEn: 'Machine Learning', labelAr: 'تعلم آلي' },
-    { id: 'DATA', labelEn: 'Data Analysis', labelAr: 'تحليل بيانات' }
+    { id: 'DATA', labelEn: 'Data Analysis', labelAr: 'تحليل بيانات' },
+    { id: 'BIGDATA', labelEn: 'Big Data', labelAr: 'بيانات ضخمة' }
   ];
 
   const filteredProjects = projectsData.filter((p) => {
     if (selectedFilter === 'ALL') return true;
     if (selectedFilter === 'ML') return p.category.en.includes('Machine Learning');
     if (selectedFilter === 'DATA') return p.category.en.includes('Data Analysis');
+    if (selectedFilter === 'BIGDATA') return p.category.en.includes('Big Data') || p.category.en.includes('Data Engineering');
     return true;
   });
 
   return (
-    <main style={{ paddingTop: '100px', paddingBottom: '96px', minHeight: '80vh' }}>
+    <main id="main-content" style={{ paddingTop: '100px', paddingBottom: '96px', minHeight: '80vh' }}>
       <div className="container">
         {/* Back Link */}
         <div style={{ marginBottom: '32px' }}>
@@ -55,6 +57,7 @@ export const ProjectsPage = () => {
         >
           {filters.map((f) => (
             <button
+              type="button"
               key={f.id}
               onClick={() => setSelectedFilter(f.id)}
               className={selectedFilter === f.id ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
@@ -68,7 +71,7 @@ export const ProjectsPage = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
             gap: '32px'
           }}
         >

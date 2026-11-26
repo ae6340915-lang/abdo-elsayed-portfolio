@@ -1,44 +1,65 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { en } from '../i18n/en';
 import { ar } from '../i18n/ar';
+import { LanguageContext } from './languageContextStore';
 
-const LanguageContext = createContext();
+const STORAGE_KEY = 'abdo-portfolio-language';
 
-export const LanguageProvider = ({ children }) => {
-  const [lang, setLangState] = useState(() => {
-    const saved = localStorage.getItem('ae_lang');
-    if (saved && (saved === 'en' || saved === 'ar')) return saved;
-    return 'en';
-  });
+const normalizeLang = (value) => (value === 'ar' ? 'ar' : 'en');
 
-  const isRtl = lang === 'ar';
-  const translations = lang === 'ar' ? ar : en;
-
-  useEffect(() => {
-    document.documentElement.setAttribute('lang', lang);
-    document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
-    localStorage.setItem('ae_lang', lang);
-  }, [lang, isRtl]);
-
-  const toggleLang = () => {
-    setLangState(prev => (prev === 'en' ? 'ar' : 'en'));
-  };
-
-  const setLang = (newLang) => {
-    if (newLang === 'en' || newLang === 'ar') {
-      setLangState(newLang);
-    }
-  };
-
-  return (
-    <LanguageContext.Provider value={{ lang, toggleLang, setLang, t: translations, isRtl }}>
-      {children}
-    </LanguageContext.Provider>
-  );
+const persistLang = (value) => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, value);
+  } catch {
+    return undefined;
+  }
+  return true;
 };
 
-export const useLanguage = () => {
-  const context = useContext(LanguageContext);
-  if (!context) throw new Error('useLanguage must be used within a LanguageProvider');
-  return context;
+const readStoredLang = () => {
+  if (typeof window === 'undefined') return 'en';
+  try {
+    return normalizeLang(window.localStorage.getItem(STORAGE_KEY));
+  } catch {
+    return 'en';
+  }
+};
+
+export const LanguageProvider = ({ children }) => {
+  const [lang, setLangState] = useState(readStoredLang);
+  const scrollPosition = useRef(null);
+  const isRtl = lang === 'ar';
+  const t = isRtl ? ar : en;
+
+  const setLang = useCallback((nextLang) => {
+    const normalized = normalizeLang(nextLang);
+    if (normalized === lang) return;
+    scrollPosition.current = { x: window.scrollX, y: window.scrollY };
+    persistLang(normalized);
+    setLangState(normalized);
+  }, [lang]);
+
+  const toggleLang = useCallback(() => {
+    setLang(lang === 'en' ? 'ar' : 'en');
+  }, [lang, setLang]);
+
+  useLayoutEffect(() => {
+    const html = document.documentElement;
+    html.setAttribute('lang', lang);
+    html.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
+    html.dataset.lang = lang;
+
+    if (!scrollPosition.current) return;
+    const { x, y } = scrollPosition.current;
+    scrollPosition.current = null;
+    const previousBehavior = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+    window.scrollTo(x, y);
+    html.style.scrollBehavior = previousBehavior;
+  }, [lang, isRtl]);
+
+  const value = useMemo(() => ({ lang, toggleLang, setLang, t, isRtl }), [lang, toggleLang, setLang, t, isRtl]);
+
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 };

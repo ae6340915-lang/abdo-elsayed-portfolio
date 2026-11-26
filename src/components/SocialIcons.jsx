@@ -2,6 +2,8 @@ import React from 'react';
 
 export const Github = ({ size = 18, color = 'currentColor', style = {} }) => (
   <svg
+    aria-hidden="true"
+    focusable="false"
     width={size}
     height={size}
     viewBox="0 0 24 24"
@@ -19,6 +21,8 @@ export const Github = ({ size = 18, color = 'currentColor', style = {} }) => (
 
 export const Linkedin = ({ size = 18, color = 'currentColor', style = {} }) => (
   <svg
+    aria-hidden="true"
+    focusable="false"
     width={size}
     height={size}
     viewBox="0 0 24 24"

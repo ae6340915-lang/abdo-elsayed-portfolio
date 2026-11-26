@@ -1,26 +1,29 @@
 import React from 'react';
-import { Terminal, LineChart, Cpu, HardDrive, Wrench, Sparkles } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { Terminal, LineChart, Cpu, Database, HardDrive, Wrench } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 import { SectionHeading } from '../components/SectionHeading';
-import { getTechIcon } from '../components/TechIcons';
+import { TechIcon } from '../components/TechIcons';
 
 export const SkillsSection = () => {
   const { t } = useLanguage();
 
   const getCategoryIcon = (id) => {
+    const iconStyle = { color: 'var(--accent)' };
     switch (id) {
       case 'programming':
-        return <Terminal size={20} style={{ color: 'var(--accent)' }} />;
-      case 'visualization':
-        return <LineChart size={20} style={{ color: 'var(--accent)' }} />;
+        return <Terminal size={20} style={iconStyle} />;
+      case 'data-analysis':
+        return <LineChart size={20} style={iconStyle} />;
       case 'ml':
-        return <Cpu size={20} style={{ color: 'var(--accent)' }} />;
+        return <Cpu size={20} style={iconStyle} />;
+      case 'databases':
+        return <Database size={20} style={iconStyle} />;
       case 'bigdata':
-        return <HardDrive size={20} style={{ color: 'var(--accent)' }} />;
+        return <HardDrive size={20} style={iconStyle} />;
       case 'tools':
-        return <Wrench size={20} style={{ color: 'var(--accent)' }} />;
+        return <Wrench size={20} style={iconStyle} />;
       default:
-        return <Terminal size={20} style={{ color: 'var(--accent)' }} />;
+        return <Terminal size={20} style={iconStyle} />;
     }
   };
 
@@ -36,21 +39,21 @@ export const SkillsSection = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '24px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+            gap: '20px'
           }}
         >
-          {t.skills.categories.map((cat) => (
+          {t.skills.categories.map((category, categoryIndex) => (
             <div
-              key={cat.id}
-              className="card"
+              key={category.id}
+              className="card reveal"
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '20px'
+                gap: '20px',
+                transitionDelay: `${categoryIndex * 0.07}s`
               }}
             >
-              {/* Category Header */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div
                   style={{
@@ -65,20 +68,13 @@ export const SkillsSection = () => {
                     flexShrink: 0
                   }}
                 >
-                  {getCategoryIcon(cat.id)}
+                  {getCategoryIcon(category.id)}
                 </div>
-                <h3
-                  style={{
-                    fontSize: '1.15rem',
-                    fontWeight: 700,
-                    color: 'var(--text-primary)'
-                  }}
-                >
-                  {cat.title}
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                  {category.title}
                 </h3>
               </div>
 
-              {/* Skills Grid */}
               <div
                 style={{
                   display: 'grid',
@@ -86,72 +82,41 @@ export const SkillsSection = () => {
                   gap: '12px'
                 }}
               >
-                {cat.items.map((skill) => {
-                  const techIcon = getTechIcon(skill, 30);
-                  if (techIcon) {
-                    return (
-                      <div
-                        key={skill}
-                        className="tech-tile"
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '8px',
-                          padding: '12px 6px',
-                          background: 'var(--bg-primary)',
-                          border: '1px solid var(--border)',
-                          borderRadius: 'var(--radius-md)',
-                          textAlign: 'center',
-                          cursor: 'default',
-                          transition: 'all var(--transition-normal)'
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '32px' }}>
-                          {techIcon}
-                        </div>
-                        <span
-                          style={{
-                            fontSize: '0.78rem',
-                            fontWeight: 600,
-                            color: 'var(--text-primary)',
-                            fontFamily: 'var(--font-mono)',
-                            lineHeight: 1.2
-                          }}
-                        >
-                          {skill}
-                        </span>
-                      </div>
-                    );
-                  }
-
-                  // Non-tool conceptual skills (e.g. Classification, Feature Engineering)
-                  return (
-                    <div
-                      key={skill}
-                      className="tech-tile"
+                {category.items.map((skill) => (
+                  <div
+                    key={skill}
+                    className="tech-tile"
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '12px 6px',
+                      background: 'var(--bg-primary)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius-md)',
+                      textAlign: 'center',
+                      cursor: 'default',
+                      transition: 'border-color var(--transition-normal), box-shadow var(--transition-normal), transform var(--transition-normal)'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '32px' }}>
+                      <TechIcon name={skill} size={30} />
+                    </div>
+                    <span
                       style={{
-                        gridColumn: 'span 2',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '10px 12px',
-                        background: 'var(--bg-primary)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: '0.8rem',
+                        fontSize: '0.78rem',
                         fontWeight: 600,
-                        color: 'var(--text-secondary)',
+                        color: 'var(--text-primary)',
                         fontFamily: 'var(--font-mono)',
-                        transition: 'all var(--transition-normal)'
+                        lineHeight: 1.2
                       }}
                     >
-                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)', flexShrink: 0 }} />
-                      <span>{skill}</span>
-                    </div>
-                  );
-                })}
+                      {skill}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
@@ -160,9 +125,13 @@ export const SkillsSection = () => {
 
       <style>{`
         .tech-tile:hover {
-          border-color: var(--accent) !important;
-          transform: translateY(-3px) scale(1.02);
-          box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.15);
+          border-color: rgba(var(--accent-rgb), 0.6) !important;
+          transform: translateY(-3px) scale(1.03);
+          box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.14);
+          background: var(--bg-card-hover) !important;
+        }
+        .tech-tile:hover span {
+          color: var(--accent) !important;
         }
       `}</style>
     </section>

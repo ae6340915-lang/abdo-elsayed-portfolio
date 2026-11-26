@@ -1,325 +1,256 @@
-import React, { useState } from 'react';
-import { Award, CheckCircle2, Clock, Calendar, ExternalLink, X, Eye, FileBadge } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import React, { useEffect, useRef, useState } from 'react';
+import { Award, Calendar, ExternalLink, Eye, X } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 import { SectionHeading } from '../components/SectionHeading';
 import { certificatesData } from '../data/certificatesData';
 
 export const CertificatesSection = () => {
-  const { lang, t, isRtl } = useLanguage();
-  const [modalCert, setModalCert] = useState(null);
+  const { lang, t } = useLanguage();
+  const [activeCert, setActiveCert] = useState(null);
+  const modalRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
+  const data = t.certificates;
+  const localize = (enValue, arValue) => (lang === 'ar' ? arValue : enValue);
+
+  useEffect(() => {
+    if (!activeCert) return undefined;
+    previouslyFocusedRef.current = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const focusFrame = window.requestAnimationFrame(() => closeButtonRef.current?.focus());
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setActiveCert(null);
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = modalRef.current?.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.cancelAnimationFrame(focusFrame);
+      document.body.style.overflow = previousOverflow;
+      previouslyFocusedRef.current?.focus();
+    };
+  }, [activeCert]);
 
   return (
-    <section id="certificates" className="section" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+    <section id="certifications" className="section" style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <div className="container">
-        <SectionHeading
-          tag={t.certificates.sectionTag}
-          title={t.certificates.title}
-          subtitle={t.certificates.subtitle}
-        />
+        <SectionHeading tag={data.sectionTag} title={data.title} subtitle={data.subtitle} />
+
+        <div
+          className="reveal"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '16px',
+            marginBottom: '32px'
+          }}
+        >
+          {data.training.map((item) => (
+            <div key={item.name} className="glass-card" style={{ padding: '20px', borderRadius: 'var(--radius-md)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                <Award size={18} style={{ color: 'var(--accent)' }} />
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.05rem' }}>{item.name}</span>
+              </div>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{item.detail}</span>
+            </div>
+          ))}
+        </div>
 
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 460px), 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 440px), 1fr))',
             gap: '28px'
           }}
         >
-          {certificatesData.map((cert) => (
+          {certificatesData.map((cert, index) => (
             <article
               key={cert.id}
-              className="card certificate-card"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '20px',
-                padding: '24px',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--border)',
-                background: 'var(--bg-card)',
-                transition: 'all var(--transition-normal)',
-                position: 'relative'
-              }}
+              className="card certificate-card reveal"
+              style={{ padding: '20px', animationDelay: `${index * 0.08}s` }}
             >
-              {/* Certificate Image Preview (Never Cropped) */}
-              <div
-                onClick={() => setModalCert(cert)}
-                className="cert-preview-box"
+              <button
+                type="button"
+                onClick={() => setActiveCert(cert)}
+                className="certificate-preview"
+                aria-label={`${data.viewCertificate}: ${localize(cert.title, cert.titleAr)}`}
                 style={{
-                  position: 'relative',
+                  width: '100%',
+                  height: '230px',
+                  padding: '14px',
                   borderRadius: 'var(--radius-md)',
-                  overflow: 'hidden',
                   border: '1px solid var(--border)',
-                  boxShadow: 'var(--shadow-sm)',
-                  cursor: 'pointer',
-                  height: '240px',
                   background: 'var(--bg-primary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: '12px'
+                  cursor: 'pointer',
+                  position: 'relative',
+                  overflow: 'hidden'
                 }}
               >
                 <img
                   src={cert.image}
-                  alt={cert.title[lang]}
+                  alt={localize(cert.title, cert.titleAr)}
+                  className="certificate-image"
+                  width={cert.width}
+                  height={cert.height}
+                  loading="lazy"
+                  decoding="async"
                   style={{
                     maxWidth: '100%',
                     maxHeight: '100%',
-                    width: 'auto',
-                    height: 'auto',
                     objectFit: 'contain',
-                    display: 'block',
-                    borderRadius: 'var(--radius-sm)',
-                    transition: 'transform var(--transition-smooth)'
+                    borderRadius: 'var(--radius-sm)'
                   }}
-                  className="cert-img-thumb"
                 />
-
-                {/* Subtle Hover Overlay */}
-                <div
-                  className="cert-hover-overlay"
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'rgba(10, 15, 23, 0.6)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    color: '#FFFFFF',
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    opacity: 0,
-                    backdropFilter: 'blur(3px)',
-                    WebkitBackdropFilter: 'blur(3px)',
-                    transition: 'opacity var(--transition-fast)'
-                  }}
-                >
+                <span className="certificate-overlay">
                   <Eye size={18} />
-                  <span>{t.certificates.viewCertificate}</span>
+                  {data.viewCertificate}
+                </span>
+              </button>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '20px 4px 4px' }}>
+                <span className="section-tag">{localize(cert.organization, cert.organizationAr)}</span>
+                <h3 style={{ fontSize: '1.25rem', margin: 0 }}>{localize(cert.title, cert.titleAr)}</h3>
+                <p style={{ fontSize: '0.9rem', lineHeight: 1.6, margin: 0 }}>{localize(cert.description, cert.descriptionAr)}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                  <Calendar size={14} style={{ color: 'var(--accent)' }} />
+                  <span>{localize(cert.date, cert.dateAr)}</span>
                 </div>
-              </div>
-
-              {/* Certificate Metadata & Details */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flexGrow: 1 }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
-                  <span className="badge" style={{ gap: '6px' }}>
-                    <CheckCircle2 size={13} />
-                    <span>{t.certificates.verifiedBadge}</span>
-                  </span>
-
-                  {cert.score && (
-                    <span
-                      style={{
-                        padding: '3px 10px',
-                        borderRadius: 'var(--radius-full)',
-                        background: 'rgba(16, 185, 129, 0.12)',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
-                        color: '#10B981',
-                        fontSize: '0.75rem',
-                        fontFamily: 'var(--font-mono)',
-                        fontWeight: 700
-                      }}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {localize(cert.skills, cert.skillsAr || cert.skills).map((skill) => (
+                    <span key={skill} className="tag" style={{ fontSize: '0.74rem' }}>{skill}</span>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', paddingTop: '6px' }}>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => setActiveCert(cert)}
+                  >
+                    <Eye size={15} />
+                    <span>{data.viewCertificate}</span>
+                  </button>
+                  {cert.credentialUrl ? (
+                    <a
+                      href={cert.credentialUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-secondary btn-sm"
                     >
-                      {cert.score}
+                      <ExternalLink size={15} />
+                      <span>{data.credentialUrl}</span>
+                    </a>
+                  ) : (
+                    <span className="btn btn-secondary btn-sm" style={{ opacity: 0.6, cursor: 'not-allowed' }}>
+                      {data.credentialMissing}
                     </span>
                   )}
-                </div>
-
-                <h3
-                  style={{
-                    fontSize: 'clamp(1.15rem, 2vw, 1.35rem)',
-                    fontWeight: 700,
-                    color: 'var(--text-primary)',
-                    lineHeight: 1.3,
-                    margin: 0
-                  }}
-                >
-                  {cert.title[lang]}
-                </h3>
-
-                <div
-                  style={{
-                    fontSize: '0.85rem',
-                    color: 'var(--accent)',
-                    fontWeight: 600,
-                    lineHeight: 1.4
-                  }}
-                >
-                  {cert.organization[lang]}
-                </div>
-
-                <p
-                  style={{
-                    fontSize: '0.9rem',
-                    color: 'var(--text-secondary)',
-                    lineHeight: 1.6,
-                    margin: 0,
-                    flexGrow: 1
-                  }}
-                >
-                  {cert.description[lang]}
-                </p>
-
-                {/* Key Spec Grid */}
-                <div
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '12px',
-                    padding: '10px 14px',
-                    background: 'var(--bg-primary)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '0.8rem',
-                    color: 'var(--text-secondary)'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Calendar size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                    <span>{cert.period || cert.issueDate}</span>
-                  </div>
-
-                  {cert.hours && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Clock size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                      <span>{cert.hours}</span>
-                    </div>
-                  )}
-
-                  {cert.score && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <FileBadge size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-                      <span>{cert.score}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Key Skills Tags */}
-                {cert.keySkills && cert.keySkills.length > 0 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {cert.keySkills.map((skill) => (
-                      <span key={skill} className="tag">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Action button */}
-                <div style={{ paddingTop: '6px' }}>
-                  <button
-                    onClick={() => setModalCert(cert)}
-                    className="btn btn-primary btn-sm"
-                    style={{ gap: '8px', width: '100%' }}
-                  >
-                    <Eye size={16} />
-                    <span>{t.certificates.viewCertificate}</span>
-                  </button>
                 </div>
               </div>
             </article>
           ))}
         </div>
+
+        <div className="reveal" style={{ marginTop: '32px' }}>
+          <span className="mono-label">{data.focusTitle}</span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
+            {data.focus.map((area) => (
+              <span key={area} className="badge">{area}</span>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Lightbox / Fullscreen Modal */}
-      {modalCert && (
+      {activeCert && (
         <div
+          className="certificate-modal"
           role="dialog"
           aria-modal="true"
+          aria-label={localize(activeCert.title, activeCert.titleAr)}
+          onClick={() => setActiveCert(null)}
           style={{
             position: 'fixed',
             inset: 0,
             zIndex: 2000,
-            backgroundColor: 'rgba(10, 15, 23, 0.9)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
+            background: 'rgba(8, 10, 12, 0.88)',
+            backdropFilter: 'blur(12px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '20px'
           }}
-          onClick={() => setModalCert(null)}
         >
           <div
-            onClick={(e) => e.stopPropagation()}
+            ref={modalRef}
+            onClick={(event) => event.stopPropagation()}
+            className="glass-card"
             style={{
-              position: 'relative',
-              maxWidth: '850px',
-              width: '100%',
+              width: 'min(900px, 100%)',
               maxHeight: '92vh',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border)',
               borderRadius: 'var(--radius-lg)',
-              overflow: 'hidden',
-              boxShadow: 'var(--shadow-lg)',
               display: 'flex',
-              flexDirection: 'column'
+              flexDirection: 'column',
+              overflow: 'hidden'
             }}
           >
-            {/* Modal Header */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                gap: '16px',
                 padding: '16px 20px',
                 borderBottom: '1px solid var(--border)'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Award size={18} style={{ color: 'var(--accent)' }} />
-                <h4 style={{ fontSize: '1rem', margin: 0, color: 'var(--text-primary)', fontWeight: 700 }}>
-                  {modalCert.title[lang]}
-                </h4>
+                <h4 style={{ fontSize: '1rem', margin: 0 }}>{localize(activeCert.title, activeCert.titleAr)}</h4>
               </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <a
-                  href={modalCert.image}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="icon-btn"
-                  title="Open original"
-                  aria-label="Open original image"
-                  style={{ width: '34px', height: '34px' }}
-                >
-                  <ExternalLink size={15} />
-                </a>
-                <button
-                  onClick={() => setModalCert(null)}
-                  className="icon-btn"
-                  title={t.certificates.closeModal}
-                  aria-label={t.certificates.closeModal}
-                  style={{ width: '34px', height: '34px' }}
-                >
-                  <X size={17} />
-                </button>
-              </div>
+              <button
+                ref={closeButtonRef}
+                type="button"
+                className="icon-btn"
+                onClick={() => setActiveCert(null)}
+                aria-label={data.closeModal}
+                style={{ width: '36px', height: '36px' }}
+              >
+                <X size={17} />
+              </button>
             </div>
-
-            {/* Modal Certificate Image */}
             <div
               style={{
                 padding: '20px',
                 overflowY: 'auto',
+                background: 'var(--bg-primary)',
                 display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                background: 'var(--bg-primary)'
+                justifyContent: 'center'
               }}
             >
               <img
-                src={modalCert.image}
-                alt={modalCert.title[lang]}
-                style={{
-                  maxWidth: '100%',
-                  maxHeight: '76vh',
-                  objectFit: 'contain',
-                  borderRadius: 'var(--radius-sm)',
-                  boxShadow: 'var(--shadow-md)'
-                }}
+                src={activeCert.image}
+                alt={localize(activeCert.title, activeCert.titleAr)}
+                width={activeCert.width}
+                height={activeCert.height}
+                decoding="async"
+                style={{ maxWidth: '100%', maxHeight: '74vh', objectFit: 'contain' }}
               />
             </div>
           </div>
@@ -329,16 +260,32 @@ export const CertificatesSection = () => {
       <style>{`
         .certificate-card:hover {
           transform: translateY(-4px);
-          border-color: var(--accent) !important;
-          box-shadow: 0 12px 28px -6px rgba(var(--accent-rgb), 0.16), var(--shadow-md);
+          border-color: var(--border-hover);
+          box-shadow: var(--shadow-md);
         }
-
-        .cert-preview-box:hover .cert-img-thumb {
-          transform: scale(1.03);
+        .certificate-image {
+          transition: transform var(--transition-smooth);
         }
-
-        .cert-preview-box:hover .cert-hover-overlay {
-          opacity: 1 !important;
+        .certificate-preview:hover .certificate-image {
+          transform: scale(1.025);
+        }
+        .certificate-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          background: rgba(8, 10, 12, 0.68);
+          color: #fff;
+          font-size: 0.875rem;
+          font-weight: 600;
+          opacity: 0;
+          transition: opacity var(--transition-fast);
+        }
+        .certificate-preview:hover .certificate-overlay,
+        .certificate-preview:focus-visible .certificate-overlay {
+          opacity: 1;
         }
       `}</style>
     </section>

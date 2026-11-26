@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, ExternalLink, Database, Layers, CheckCircle, AlertTriangle, ArrowUpRight, ListOrdered } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { ArrowLeft, ArrowRight, ExternalLink, ListOrdered } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 import { projectsData } from '../data/projectsData';
 import { ProjectVisual } from '../components/DataVisuals';
 import { Github } from '../components/SocialIcons';
@@ -38,7 +38,7 @@ export const ProjectDetailsPage = () => {
     { id: 'sec-challenges', label: sections.challenges },
     { id: 'sec-insights', label: sections.keyInsights },
     { id: 'sec-lessons', label: sections.lessonsLearned },
-    { id: 'sec-repo', label: sections.githubLink }
+    ...(project.githubUrl ? [{ id: 'sec-repo', label: sections.githubLink }] : [])
   ];
 
   const scrollToSec = (id) => {
@@ -47,7 +47,7 @@ export const ProjectDetailsPage = () => {
   };
 
   return (
-    <main style={{ paddingTop: '100px', paddingBottom: '96px', minHeight: '100vh' }}>
+    <main id="main-content" style={{ paddingTop: '100px', paddingBottom: '96px', minHeight: '100vh' }}>
       <div className="container">
         {/* Navigation Breadcrumbs & Actions */}
         <div
@@ -69,17 +69,19 @@ export const ProjectDetailsPage = () => {
             <span>{t.projects.backHome}</span>
           </Link>
 
-          <a
-            href={project.githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary btn-sm"
-            style={{ gap: '8px' }}
-          >
-            <Github size={16} />
-            <span>{t.projects.githubRepo}</span>
-            <ExternalLink size={14} />
-          </a>
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary btn-sm"
+              style={{ gap: '8px' }}
+            >
+              <Github size={16} />
+              <span>{t.projects.githubRepo}</span>
+              <ExternalLink size={14} />
+            </a>
+          )}
         </div>
 
         {/* Case Study Header Banner */}
@@ -157,9 +159,9 @@ export const ProjectDetailsPage = () => {
               borderTop: '1px solid var(--border)'
             }}
           >
-            {project.datasetStats.map((stat, idx) => (
+            {project.datasetStats.map((stat) => (
               <div
-                key={idx}
+                key={stat.labelEn}
                 style={{
                   padding: '14px 18px',
                   background: 'var(--bg-card)',
@@ -254,6 +256,7 @@ export const ProjectDetailsPage = () => {
 
             {tocItems.map((item) => (
               <button
+                type="button"
                 key={item.id}
                 onClick={() => scrollToSec(item.id)}
                 style={{
@@ -428,35 +431,37 @@ export const ProjectDetailsPage = () => {
             </section>
 
             {/* 14. Repository & Implementation Link */}
-            <section
-              id="sec-repo"
-              className="card"
-              style={{
-                background: 'var(--bg-secondary)',
-                textAlign: 'center',
-                padding: '36px'
-              }}
-            >
-              <h2 style={{ fontSize: '1.35rem', marginBottom: '12px', color: 'var(--text-primary)' }}>
-                {sections.githubLink}
-              </h2>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
-                {lang === 'ar'
-                  ? 'استكشف الكود البرمجي الكامل، ودفاتر Jupyter، ومسارات المعالجة على GitHub.'
-                  : 'Explore the complete code repository, Jupyter notebooks, and preprocessing scripts on GitHub.'}
-              </p>
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-primary"
-                style={{ display: 'inline-flex', gap: '8px' }}
+            {project.githubUrl && (
+              <section
+                id="sec-repo"
+                className="card"
+                style={{
+                  background: 'var(--bg-secondary)',
+                  textAlign: 'center',
+                  padding: '36px'
+                }}
               >
-                <Github size={18} />
-                <span>{t.projects.githubRepo}</span>
-                <ExternalLink size={14} />
-              </a>
-            </section>
+                <h2 style={{ fontSize: '1.35rem', marginBottom: '12px', color: 'var(--text-primary)' }}>
+                  {sections.githubLink}
+                </h2>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
+                  {lang === 'ar'
+                    ? 'استكشف الكود البرمجي الكامل، ودفاتر Jupyter، ومسارات المعالجة على GitHub.'
+                    : 'Explore the complete code repository, Jupyter notebooks, and preprocessing scripts on GitHub.'}
+                </p>
+                <a
+                  href={project.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                  style={{ display: 'inline-flex', gap: '8px' }}
+                >
+                  <Github size={18} />
+                  <span>{t.projects.githubRepo}</span>
+                  <ExternalLink size={14} />
+                </a>
+              </section>
+            )}
           </div>
         </div>
 

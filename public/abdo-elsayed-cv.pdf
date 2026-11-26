@@ -1,0 +1,68 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 2734 >>
+stream
+BT /F2 22 Tf 56 790 Td (Abdo Elsayed) Tj ET
+BT /F2 11 Tf 56 761 Td (Aspiring Data Engineer | Data Analyst | Machine Learning Enthusiast) Tj ET
+BT /F1 10 Tf 56 743 Td (DATA x ANALYTICS x MACHINE LEARNING x ENGINEERING) Tj ET
+BT /F2 12 Tf 56 711 Td (CONTACT) Tj ET
+BT /F1 10 Tf 56 692 Td (Email: ae6340915@gmail.com) Tj ET
+BT /F1 10 Tf 56 675 Td (Phone: +20 100 735 9481) Tj ET
+BT /F1 10 Tf 56 658 Td (GitHub: github.com/ae6340915-lang) Tj ET
+BT /F1 10 Tf 56 641 Td (LinkedIn: linkedin.com/in/abdo-elsayed-317874358/) Tj ET
+BT /F1 10 Tf 56 624 Td (Location: Zagazig, Egypt) Tj ET
+BT /F2 12 Tf 56 592 Td (EDUCATION) Tj ET
+BT /F1 10 Tf 56 573 Td (Faculty of Computers and Information, Information Systems Department) Tj ET
+BT /F1 10 Tf 56 556 Td (Zagazig University, Egypt) Tj ET
+BT /F2 12 Tf 56 524 Td (TECHNICAL SKILLS) Tj ET
+BT /F1 10 Tf 56 505 Td (Programming: Python, SQL, C++) Tj ET
+BT /F1 10 Tf 56 488 Td (Data Analysis: Pandas, NumPy, Data Cleaning, EDA, Data Preprocessing) Tj ET
+BT /F1 10 Tf 56 471 Td (Visualization: Matplotlib, Seaborn, Tableau) Tj ET
+BT /F1 10 Tf 56 454 Td (Machine Learning: Scikit-learn, Logistic Regression, SVM, KNN, Classification, Feature Engineering, Model Evaluation) Tj ET
+BT /F1 10 Tf 56 437 Td (Big Data: Hadoop, HDFS, Apache Spark, PySpark, Hive, HBase) Tj ET
+BT /F1 10 Tf 56 420 Td (Tools: Git, GitHub, Jupyter Notebook, VS Code, PyCharm, Anaconda) Tj ET
+BT /F2 12 Tf 56 388 Td (SELECTED PROJECTS) Tj ET
+BT /F1 10 Tf 56 369 Td (1. Industrial Motor Fault Diagnosis - 58,509 records, 48 features, 11 classes) Tj ET
+BT /F1 10 Tf 56 352 Td (2. Online Food Ordering Data Analysis & Classification - Logistic Regression) Tj ET
+BT /F1 10 Tf 56 335 Td (3. Dry Bean Classification - Label Encoding, scaling, SVM) Tj ET
+BT /F1 10 Tf 56 318 Td (4. Wildfire Risk Data Analysis - large-scale EDA and visualization) Tj ET
+BT /F1 10 Tf 56 301 Td (5. Olympic Big Data Analysis - Hadoop, HDFS, Spark, PySpark) Tj ET
+BT /F1 10 Tf 56 284 Td (6. Sales Data Processing with PySpark - ingestion, transformation, aggregation) Tj ET
+BT /F1 10 Tf 56 267 Td (7. E-Commerce Data Analysis & Database Project - SQL, MongoDB, Streamlit) Tj ET
+BT /F1 10 Tf 56 250 Td (8. Logistic Regression Classification - preprocessing, stratified split, metrics) Tj ET
+BT /F1 10 Tf 56 233 Td (9. SVM Machine Learning Project - scaling, classification, evaluation) Tj ET
+BT /F2 12 Tf 56 201 Td (TRAINING) Tj ET
+BT /F1 10 Tf 56 182 Td (Big Data: Hadoop, HDFS, Hive, HBase, Spark, PySpark) Tj ET
+BT /F1 10 Tf 56 165 Td (Machine Learning: Data Preprocessing, Classification, Logistic Regression, SVM, KNN, Feature Engineering, Model Evaluation) Tj ET
+BT /F1 10 Tf 56 148 Td (Additional Learning: NTI, DEPI, Creativa, Huawei ICT Academy) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000003036 00000 n 
+0000003106 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+3181
+%%EOF

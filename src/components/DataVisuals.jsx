@@ -1,37 +1,36 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useLanguage } from '../context/LanguageContext';
-import { useTheme } from '../context/ThemeContext';
+import React, { useEffect, useRef } from 'react';
+import { useLanguage } from '../hooks/useLanguage';
+import { useTheme } from '../hooks/useTheme';
 
 // Hero Network Visual: Interactive Canvas with interconnected nodes, signal pulses, and coordinate lines
 export const HeroNetworkVisual = () => {
   const canvasRef = useRef(null);
-  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
+  const mousePosRef = useRef({ x: -1000, y: -1000 });
   const { lang, isRtl } = useLanguage();
   const { theme } = useTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) return undefined;
     const ctx = canvas.getContext('2d');
-    let animationFrameId;
-    let width = (canvas.width = canvas.parentElement.clientWidth || 500);
-    let height = (canvas.height = canvas.parentElement.clientHeight || 450);
-
-    const handleResize = () => {
-      if (!canvas || !canvas.parentElement) return;
-      width = canvas.width = canvas.parentElement.clientWidth;
-      height = canvas.height = canvas.parentElement.clientHeight;
-    };
-    window.addEventListener('resize', handleResize);
+    if (!ctx) return undefined;
 
     const isLight = theme === 'light';
-    const accentRgb = isLight ? '2, 132, 199' : '66, 182, 232';
-    const accentHex = isLight ? '#0284C7' : '#42B6E8';
+    const accentRgb = isLight ? '14, 116, 144' : '45, 212, 191';
+    const accentHex = isLight ? '#0e7490' : '#2dd4bf';
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let width = 0;
+    let height = 0;
+    let time = 0;
+    let nodes = [];
+    let animationFrameId = 0;
+    let lastRender = 0;
+    let isVisible = false;
+    let isPageVisible = !document.hidden;
 
-    const nodeCount = Math.min(32, Math.floor((width * height) / 6500) + 12);
-    const nodes = [];
-    for (let i = 0; i < nodeCount; i++) {
-      nodes.push({
+    const initNodes = () => {
+      const nodeCount = Math.min(32, Math.floor((width * height) / 6500) + 12);
+      nodes = Array.from({ length: nodeCount }, (_, i) => ({
         x: Math.random() * width,
         y: Math.random() * height,
         vx: (Math.random() - 0.5) * 0.45,
@@ -39,15 +38,25 @@ export const HeroNetworkVisual = () => {
         radius: Math.random() * 2.2 + 2,
         pulse: Math.random() * Math.PI * 2,
         isHub: i % 5 === 0
-      });
-    }
+      }));
+    };
 
-    let time = 0;
-    const render = () => {
+    const resizeCanvas = () => {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      const rect = parent.getBoundingClientRect();
+      width = Math.max(1, Math.floor(rect.width));
+      height = Math.max(1, Math.floor(rect.height));
+      canvas.width = width;
+      canvas.height = height;
+      initNodes();
+      drawFrame();
+    };
+
+    function drawFrame() {
       time += 0.02;
       ctx.clearRect(0, 0, width, height);
 
-      // Subtle coordinate background grid
       ctx.strokeStyle = `rgba(${accentRgb}, ${isLight ? '0.04' : '0.06'})`;
       ctx.lineWidth = 1;
       const gridSize = 36;
@@ -64,9 +73,8 @@ export const HeroNetworkVisual = () => {
         ctx.stroke();
       }
 
-      // Update and draw connections
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
+      for (let i = 0; i < nodes.length; i += 1) {
+        for (let j = i + 1; j < nodes.length; j += 1) {
           const dx = nodes[i].x - nodes[j].x;
           const dy = nodes[i].y - nodes[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
@@ -81,11 +89,10 @@ export const HeroNetworkVisual = () => {
             ctx.lineTo(nodes[j].x, nodes[j].y);
             ctx.stroke();
 
-            // Flowing data packets along edges
             if ((i + j) % 4 === 0) {
-              const tProgress = (time * 0.45 + (i * 0.18)) % 1;
-              const px = nodes[i].x + (nodes[j].x - nodes[i].x) * tProgress;
-              const py = nodes[i].y + (nodes[j].y - nodes[i].y) * tProgress;
+              const progress = (time * 0.45 + i * 0.18) % 1;
+              const px = nodes[i].x + (nodes[j].x - nodes[i].x) * progress;
+              const py = nodes[i].y + (nodes[j].y - nodes[i].y) * progress;
               ctx.fillStyle = `rgba(${accentRgb}, ${isLight ? '0.9' : '0.85'})`;
               ctx.beginPath();
               ctx.arc(px, py, 1.8, 0, Math.PI * 2);
@@ -95,7 +102,6 @@ export const HeroNetworkVisual = () => {
         }
       }
 
-      // Update and draw nodes
       nodes.forEach((node) => {
         node.x += node.vx;
         node.y += node.vy;
@@ -103,10 +109,10 @@ export const HeroNetworkVisual = () => {
         if (node.x < 10 || node.x > width - 10) node.vx *= -1;
         if (node.y < 10 || node.y > height - 10) node.vy *= -1;
 
-        const mdx = mousePos.x - node.x;
-        const mdy = mousePos.y - node.y;
+        const mdx = mousePosRef.current.x - node.x;
+        const mdy = mousePosRef.current.y - node.y;
         const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-        if (mdist < 140) {
+        if (mdist < 140 && mdist > 0) {
           node.x += (mdx / mdist) * 0.6;
           node.y += (mdy / mdist) * 0.6;
         }
@@ -125,17 +131,64 @@ export const HeroNetworkVisual = () => {
           ctx.stroke();
         }
       });
+    }
 
-      animationFrameId = requestAnimationFrame(render);
+    const render = (timestamp) => {
+      if (!isVisible || !isPageVisible) {
+        animationFrameId = 0;
+        return;
+      }
+      if (timestamp - lastRender < 33) {
+        animationFrameId = window.requestAnimationFrame(render);
+        return;
+      }
+      lastRender = timestamp;
+      drawFrame();
+      animationFrameId = window.requestAnimationFrame(render);
     };
 
-    render();
+    const start = () => {
+      if (animationFrameId || !isVisible || !isPageVisible) return;
+      if (reducedMotion) {
+        drawFrame();
+        return;
+      }
+      lastRender = 0;
+      animationFrameId = window.requestAnimationFrame(render);
+    };
+
+    const stop = () => {
+      if (animationFrameId) window.cancelAnimationFrame(animationFrameId);
+      animationFrameId = 0;
+    };
+
+    const intersectionObserver = new IntersectionObserver((entries) => {
+      isVisible = Boolean(entries[0]?.isIntersecting);
+      if (isVisible) start();
+      else stop();
+    }, { threshold: 0.01 });
+    intersectionObserver.observe(canvas);
+
+    const resizeObserver = new ResizeObserver(resizeCanvas);
+    if (canvas.parentElement) resizeObserver.observe(canvas.parentElement);
+
+    const handleVisibility = () => {
+      isPageVisible = !document.hidden;
+      if (isPageVisible) start();
+      else stop();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    resizeCanvas();
+    start();
 
     return () => {
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameId);
+      stop();
+      intersectionObserver.disconnect();
+      resizeObserver.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, [mousePos, theme]);
+  }, [theme]);
 
   return (
     <div
@@ -149,11 +202,11 @@ export const HeroNetworkVisual = () => {
         background: 'var(--hero-visual-bg)',
         overflow: 'hidden'
       }}
-      onMouseMove={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+      onMouseMove={(event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        mousePosRef.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
       }}
-      onMouseLeave={() => setMousePos({ x: -1000, y: -1000 })}
+      onMouseLeave={() => { mousePosRef.current = { x: -1000, y: -1000 }; }}
     >
       <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }} />
       <div
@@ -354,6 +407,96 @@ export const AirQualityMapVisual = () => (
   </svg>
 );
 
+const WildfireRiskVisual = () => (
+  <svg viewBox="0 0 400 210" width="100%" height="100%" style={{ display: 'block' }}>
+    <defs>
+      <linearGradient id="fireGrad" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.15" />
+        <stop offset="55%" stopColor="#F59E0B" stopOpacity="0.4" />
+        <stop offset="100%" stopColor="#EF4444" stopOpacity="0.55" />
+      </linearGradient>
+    </defs>
+    {[40, 80, 120, 160].map((y) => (
+      <line key={y} x1="25" y1={y} x2="375" y2={y} stroke="var(--border)" strokeDasharray="2 4" />
+    ))}
+    <path d="M40,170 Q90,150 140,160 T240,140 T360,150 L360,190 L40,190 Z" fill="url(#fireGrad)" stroke="var(--border-hover)" />
+    <path d="M70,155 Q110,120 150,140 T230,110 T330,130" fill="none" stroke="#EF4444" strokeWidth="2" />
+    <circle cx="150" cy="140" r="5" fill="#EF4444" stroke="var(--bg-primary)" strokeWidth="2" />
+    <circle cx="230" cy="110" r="6" fill="#F59E0B" stroke="var(--bg-primary)" strokeWidth="2" />
+    <rect x="28" y="16" width="150" height="24" rx="4" fill="var(--bg-card)" stroke="var(--border)" />
+    <text x="38" y="32" fill="var(--text-secondary)" fontSize="10" fontFamily="var(--font-mono)">RISK SURFACE / TARGET</text>
+  </svg>
+);
+
+const OlympicBigDataVisual = () => (
+  <svg viewBox="0 0 400 210" width="100%" height="100%" style={{ display: 'block' }}>
+    <line x1="45" y1="175" x2="365" y2="175" stroke="var(--border)" />
+    <line x1="45" y1="25" x2="45" y2="175" stroke="var(--border)" />
+    {[70, 118, 166, 214, 262, 310].map((x, i) => (
+      <rect key={x} x={x} y={135 - i * 13} width="28" height={40 + i * 13} rx="4" fill="rgba(var(--accent-rgb), 0.35)" stroke="var(--accent)" />
+    ))}
+    <path d="M60,145 L105,118 L150,126 L195,88 L240,96 L285,60 L330,52" fill="none" stroke="#10B981" strokeWidth="2.4" />
+    <text x="250" y="42" fill="#10B981" fontSize="10" fontFamily="var(--font-mono)">SPARK TREND</text>
+    <text x="52" y="198" fill="var(--text-muted)" fontSize="10" fontFamily="var(--font-mono)">HDFS → SPARK → INSIGHT</text>
+  </svg>
+);
+
+const SalesPipelineVisual = () => (
+  <svg viewBox="0 0 400 210" width="100%" height="100%" style={{ display: 'block' }}>
+    {[45, 160, 275].map((x, i) => (
+      <g key={x}>
+        <rect x={x} y="70" width="82" height="58" rx="8" fill="var(--bg-card)" stroke="var(--border)" />
+        <text x={x + 12} y="92" fill="var(--accent)" fontSize="10" fontFamily="var(--font-mono)">STEP 0{i + 1}</text>
+        <text x={x + 12} y="112" fill="var(--text-secondary)" fontSize="9" fontFamily="var(--font-mono)">
+          {['INGEST', 'TRANSFORM', 'AGGREGATE'][i]}
+        </text>
+        {i < 2 && <line x1={x + 84} y1="99" x2={x + 112} y2="99" stroke="var(--accent)" strokeWidth="1.5" />}
+      </g>
+    ))}
+    <path d="M45,155 Q200,185 355,155" fill="none" stroke="#10B981" strokeWidth="2" strokeDasharray="5 4" />
+    <text x="155" y="185" fill="#10B981" fontSize="10" fontFamily="var(--font-mono)">DISTRIBUTED OUTPUT</text>
+  </svg>
+);
+
+const EcommerceVisual = () => (
+  <svg viewBox="0 0 400 210" width="100%" height="100%" style={{ display: 'block' }}>
+    <rect x="40" y="35" width="130" height="140" rx="8" fill="var(--bg-card)" stroke="var(--border)" />
+    <text x="55" y="58" fill="var(--accent)" fontSize="10" fontFamily="var(--font-mono)">SQL TABLES</text>
+    {[78, 100, 122].map((y) => <line key={y} x1="55" y1={y} x2="155" y2={y} stroke="var(--border)" />)}
+    <rect x="225" y="35" width="135" height="140" rx="8" fill="var(--bg-card)" stroke="var(--border)" />
+    <text x="240" y="58" fill="var(--accent)" fontSize="10" fontFamily="var(--font-mono)">STREAMLIT</text>
+    <rect x="240" y="72" width="105" height="12" rx="3" fill="rgba(var(--accent-rgb), 0.3)" />
+    <rect x="240" y="94" width="78" height="12" rx="3" fill="rgba(var(--accent-rgb), 0.2)" />
+    <rect x="240" y="116" width="92" height="12" rx="3" fill="rgba(var(--accent-rgb), 0.25)" />
+    <path d="M175,105 L220,105" stroke="#10B981" strokeWidth="2" />
+    <text x="170" y="96" fill="#10B981" fontSize="9" fontFamily="var(--font-mono)">PANDAS</text>
+  </svg>
+);
+
+const LogisticCurveVisual = () => (
+  <svg viewBox="0 0 400 210" width="100%" height="100%" style={{ display: 'block' }}>
+    <line x1="50" y1="175" x2="360" y2="175" stroke="var(--border)" />
+    <line x1="50" y1="25" x2="50" y2="175" stroke="var(--border)" />
+    <line x1="50" y1="100" x2="360" y2="100" stroke="var(--border)" strokeDasharray="4 4" />
+    <path d="M50,172 C140,170 170,150 205,100 C240,50 280,32 360,30" fill="none" stroke="var(--accent)" strokeWidth="2.8" />
+    <circle cx="205" cy="100" r="5" fill="#10B981" stroke="var(--bg-primary)" strokeWidth="2" />
+    <text x="245" y="152" fill="var(--text-muted)" fontSize="10" fontFamily="var(--font-mono)">P = 1 / (1 + e^-z)</text>
+  </svg>
+);
+
+const SvmBoundaryVisual = () => (
+  <svg viewBox="0 0 400 210" width="100%" height="100%" style={{ display: 'block' }}>
+    <line x1="45" y1="175" x2="365" y2="175" stroke="var(--border)" />
+    <line x1="45" y1="25" x2="45" y2="175" stroke="var(--border)" />
+    <path d="M110,175 Q260,110 330,25" fill="none" stroke="var(--accent)" strokeWidth="2" />
+    <path d="M90,175 Q235,122 305,25" fill="none" stroke="var(--border)" strokeDasharray="4 4" />
+    <path d="M130,175 Q285,98 355,25" fill="none" stroke="var(--border)" strokeDasharray="4 4" />
+    {[[90, 145], [120, 120], [150, 150], [175, 105]].map(([cx, cy]) => <circle key={cx} cx={cx} cy={cy} r="4" fill="var(--accent)" />)}
+    {[[270, 95], [300, 65], [330, 90], [350, 50]].map(([cx, cy]) => <circle key={cx} cx={cx} cy={cy} r="4" fill="#10B981" />)}
+    <text x="255" y="175" fill="var(--text-muted)" fontSize="9" fontFamily="var(--font-mono)">SVM MARGIN</text>
+  </svg>
+);
+
 export const ProjectVisual = ({ type }) => {
   switch (type) {
     case 'motor':
@@ -362,6 +505,18 @@ export const ProjectVisual = ({ type }) => {
       return <BeanMorphologyVisual />;
     case 'food':
       return <FoodOrderFunnelVisual />;
+    case 'wildfire':
+      return <WildfireRiskVisual />;
+    case 'olympic':
+      return <OlympicBigDataVisual />;
+    case 'sales':
+      return <SalesPipelineVisual />;
+    case 'ecommerce':
+      return <EcommerceVisual />;
+    case 'logistic':
+      return <LogisticCurveVisual />;
+    case 'svm':
+      return <SvmBoundaryVisual />;
     case 'air':
       return <AirQualityMapVisual />;
     default:

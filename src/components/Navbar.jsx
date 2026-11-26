@@ -1,60 +1,53 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Sun, Moon, Globe, Menu, X, Mail } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
-import { useLanguage } from '../context/LanguageContext';
-import { Github, Linkedin } from './SocialIcons';
-import { profileConfig } from '../data/profileData';
+import { Sun, Moon, Menu, X, ArrowUpRight } from 'lucide-react';
+import { useTheme } from '../hooks/useTheme';
+import { useLanguage } from '../hooks/useLanguage';
+
+const sections = ['hero', 'about', 'skills', 'projects', 'education', 'certifications', 'services', 'contact'];
 
 export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
-  const { lang, toggleLang, t, isRtl } = useLanguage();
+  const { lang, setLang, t, isRtl } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const location = useLocation();
   const navigate = useNavigate();
-  
-  // متغير عشان نمنع المراقب من التدخل أثناء التمرير
   const isScrolling = useRef(false);
 
   useEffect(() => {
+    let frame = 0;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        const next = window.scrollY > 20;
+        setIsScrolled((current) => (current === next ? current : next));
+        frame = 0;
+      });
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   useEffect(() => {
-    if (location.pathname !== '/') return;
-
-    const sections = ['hero', 'about', 'skills', 'soft-skills', 'projects', 'services', 'certificates', 'journey', 'contact', 'freelance'];
-    const observers = [];
-
-    sections.forEach((id) => {
-      const el = document.getElementById(id);
-      if (!el) return;
+    if (location.pathname !== '/') return undefined;
+    const observers = sections.map((id) => {
+      const element = document.getElementById(id);
+      if (!element) return null;
       const observer = new IntersectionObserver(
         ([entry]) => {
-          // بنمنع المراقب من التغيير لو إحنا بنعمل تمرير
-          if (entry.isIntersecting && !isScrolling.current) {
-            if (id === 'soft-skills') {
-              setActiveSection('skills');
-            } else if (id === 'freelance') {
-              setActiveSection('contact');
-            } else {
-              setActiveSection(id);
-            }
-          }
+          if (entry.isIntersecting && !isScrolling.current) setActiveSection(id);
         },
-        { threshold: 0.2, rootMargin: '-70px 0px -40% 0px' }
+        { threshold: 0.18, rootMargin: '-72px 0px -42% 0px' }
       );
-      observer.observe(el);
-      observers.push(observer);
+      observer.observe(element);
+      return observer;
     });
-
-    return () => observers.forEach((obs) => obs.disconnect());
+    return () => observers.forEach((observer) => observer?.disconnect());
   }, [location.pathname]);
 
   const navLinks = [
@@ -62,34 +55,48 @@ export const Navbar = () => {
     { id: 'about', label: t.nav.about },
     { id: 'skills', label: t.nav.skills },
     { id: 'projects', label: t.nav.projects },
-    { id: 'services', label: t.nav.services || 'Services' },
-    { id: 'certificates', label: t.nav.certificates },
-    { id: 'journey', label: t.nav.journey },
+    { id: 'education', label: t.nav.education },
+    { id: 'certifications', label: t.nav.certifications },
+    { id: 'services', label: t.nav.services },
     { id: 'contact', label: t.nav.contact, isButton: true }
   ];
 
   const handleNavClick = (id) => {
     setMobileMenuOpen(false);
-    isScrolling.current = true; // فعلنا التمرير عشان نوقف المراقب
-
+    isScrolling.current = true;
+    const scroll = () => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => { isScrolling.current = false; }, 900);
+    };
     if (location.pathname !== '/') {
       navigate('/#' + id);
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        }
-        // بعد ما التمرير يخلص، نرجع نشغل المراقب تاني
-        setTimeout(() => { isScrolling.current = false; }, 1000);
-      }, 100);
+      setTimeout(scroll, 100);
     } else {
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
-      setTimeout(() => { isScrolling.current = false; }, 1000);
+      scroll();
     }
   };
+
+  const renderLanguageSwitcher = (className = '') => (
+    <div className={`lang-switcher ${className}`} role="group" aria-label={t.nav.switchLanguage}>
+      <button
+        type="button"
+        className={lang === 'en' ? 'active' : ''}
+        onClick={() => setLang('en')}
+        aria-pressed={lang === 'en'}
+      >
+        EN
+      </button>
+      <span aria-hidden="true">|</span>
+      <button
+        type="button"
+        className={lang === 'ar' ? 'active' : ''}
+        onClick={() => setLang('ar')}
+        aria-pressed={lang === 'ar'}
+      >
+        AR
+      </button>
+    </div>
+  );
 
   return (
     <header
@@ -100,208 +107,77 @@ export const Navbar = () => {
         right: 0,
         zIndex: 1000,
         backgroundColor: isScrolled ? 'var(--nav-bg)' : 'transparent',
-        backdropFilter: isScrolled ? 'blur(14px)' : 'none',
-        WebkitBackdropFilter: isScrolled ? 'blur(14px)' : 'none',
+        backdropFilter: isScrolled ? 'blur(16px)' : 'none',
+        WebkitBackdropFilter: isScrolled ? 'blur(16px)' : 'none',
         borderBottom: isScrolled ? '1px solid var(--nav-border)' : '1px solid transparent',
         transition: 'all var(--transition-normal)'
       }}
     >
-      <div
-        className="container"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: '72px',
-          gap: '16px'
-        }}
-      >
-        {/* Brand Personal Logo from public/logo.png */}
+      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '72px', gap: '16px' }}>
         <Link
           to="/"
           onClick={() => handleNavClick('hero')}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '10px',
-            textDecoration: 'none'
-          }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}
           aria-label="Abdo Elsayed Home"
         >
-          <img
-            src="/logo.png"
-            alt="Abdo Elsayed Logo"
-            style={{
-              width: '38px',
-              height: '38px',
-              objectFit: 'cover',
-              borderRadius: '9px',
-              border: '1px solid rgba(6, 182, 212, 0.3)',
-              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.25)'
-            }}
-          />
+          <span className="ae-monogram" aria-hidden="true">AE</span>
           <span
             style={{
-              fontFamily: 'var(--font-mono)',
+              fontFamily: 'var(--font-display)',
               fontWeight: 800,
-              fontSize: '1.25rem',
+              fontSize: '1.2rem',
               color: 'var(--text-primary)',
-              letterSpacing: '-0.02em',
-              display: 'inline-block'
+              letterSpacing: '-0.03em'
             }}
           >
-            Abdelrahman Elsayed<span style={{ color: 'var(--accent)' }}>.</span>
+            Abdo Elsayed<span style={{ color: 'var(--accent)' }}>.</span>
           </span>
         </Link>
 
-        {/* Desktop Nav Links */}
-        <nav
-          style={{
-            alignItems: 'center',
-            gap: '22px'
-          }}
-          className="desktop-nav"
-        >
+        <nav className="desktop-nav" style={{ alignItems: 'center', gap: '18px' }}>
           {navLinks.map((link) => {
             const isActive = location.pathname === '/' && activeSection === link.id;
-
             if (link.isButton) {
               return (
                 <button
+                  type="button"
                   key={link.id}
                   onClick={() => handleNavClick(link.id)}
-                  className="nav-contact-btn"
-                  style={{
-                    background: isActive ? 'var(--badge-bg)' : 'transparent',
-                    border: '1.5px solid var(--accent)',
-                    color: 'var(--accent)',
-                    fontWeight: 600,
-                    fontSize: '0.875rem',
-                    cursor: 'pointer',
-                    padding: '7px 16px',
-                    borderRadius: 'var(--radius-full)',
-                    transition: 'all var(--transition-fast)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--accent)';
-                    e.currentTarget.style.color = '#FFFFFF';
-                    e.currentTarget.style.boxShadow = 'var(--shadow-accent)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = isActive ? 'var(--badge-bg)' : 'transparent';
-                    e.currentTarget.style.color = 'var(--accent)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
+                  className="nav-connect-btn"
                 >
-                  {link.label}
+                  <span>{t.nav.connect}</span>
+                  <ArrowUpRight size={14} style={{ transform: isRtl ? 'scaleX(-1)' : 'none' }} />
                 </button>
               );
             }
-
             return (
               <button
+                type="button"
                 key={link.id}
                 onClick={() => handleNavClick(link.id)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                  fontWeight: isActive ? 600 : 500,
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  padding: '6px 0',
-                  position: 'relative',
-                  transition: 'color var(--transition-fast)'
-                }}
+                className="nav-link"
+                aria-current={isActive ? 'location' : undefined}
+                style={{ color: isActive ? 'var(--accent)' : 'var(--text-secondary)' }}
               >
                 {link.label}
-                {isActive && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      bottom: '-2px',
-                      left: 0,
-                      right: 0,
-                      height: '2px',
-                      backgroundColor: 'var(--accent)',
-                      borderRadius: '1px'
-                    }}
-                  />
-                )}
+                {isActive && <span className="nav-link-indicator" />}
               </button>
             );
           })}
         </nav>
 
-        {/* Toolbar: Social Contact Icons + Language Switcher + Theme Switcher */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {/* Top Navbar Contact Icons (GitHub, LinkedIn, Email) */}
-          <div className="nav-socials" style={{ alignItems: 'center', gap: '6px' }}>
-            <a
-              href={profileConfig.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="icon-btn"
-              style={{ width: '34px', height: '34px' }}
-              title="GitHub Profile"
-              aria-label="GitHub Profile"
-            >
-              <Github size={15} />
-            </a>
-
-            <a
-              href={profileConfig.linkedinUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="icon-btn"
-              style={{ width: '34px', height: '34px' }}
-              title="LinkedIn Profile"
-              aria-label="LinkedIn Profile"
-            >
-              <Linkedin size={15} />
-            </a>
-
-            <a
-              href={'mailto:' + profileConfig.email}
-              className="icon-btn"
-              style={{ width: '34px', height: '34px' }}
-              title="Send Email"
-              aria-label="Send Direct Email"
-            >
-              <Mail size={15} />
-            </a>
-          </div>
-
-          <span className="nav-divider" style={{ width: '1px', height: '22px', backgroundColor: 'var(--border)', marginInline: '4px' }} />
-
-          {/* Language Switcher */}
-          <button
-            onClick={toggleLang}
-            className="icon-btn"
-            style={{ width: 'auto', paddingInline: '10px', height: '36px', gap: '5px', fontSize: '0.8rem', fontWeight: 600 }}
-            title={t.nav.switchLang}
-            aria-label={t.nav.switchLang}
-          >
-            <Globe size={14} />
-            <span>{lang === 'en' ? 'AR' : 'EN'}</span>
-          </button>
-
-          {/* Theme Switcher */}
-          <button
-            onClick={toggleTheme}
-            className="icon-btn"
-            style={{ width: '36px', height: '36px' }}
-            title={t.nav.switchTheme}
-            aria-label={t.nav.switchTheme}
-          >
+          <button type="button" onClick={toggleTheme} className="icon-btn" title={t.nav.switchTheme} aria-label={t.nav.switchTheme} style={{ width: '36px', height: '36px' }}>
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-
-          {/* Mobile Menu Toggle */}
+          {renderLanguageSwitcher('desktop-lang')}
           <button
+            type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="icon-btn mobile-toggle"
             aria-label={mobileMenuOpen ? t.nav.closeMenu : t.nav.menu}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-nav-menu"
             style={{ width: '36px', height: '36px' }}
           >
             {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
@@ -309,98 +185,166 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '72px',
-            left: 0,
-            right: 0,
-            background: 'var(--bg-card)',
-            borderBottom: '1px solid var(--border)',
-            padding: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px',
-            boxShadow: 'var(--shadow-lg)'
-          }}
-        >
-          {navLinks.map((link) => (
+        <div id="mobile-nav-menu" className="mobile-menu">
+          {navLinks.map((link) => {
+            const isActive = location.pathname === '/' && activeSection === link.id;
+            return (
             <button
+              type="button"
               key={link.id}
               onClick={() => handleNavClick(link.id)}
-              style={{
-                background: link.isButton ? 'var(--badge-bg)' : 'none',
-                border: link.isButton ? '1px solid var(--accent)' : 'none',
-                borderRadius: link.isButton ? 'var(--radius-md)' : '0',
-                textAlign: isRtl ? 'right' : 'left',
-                color: activeSection === link.id || link.isButton ? 'var(--accent)' : 'var(--text-primary)',
-                fontSize: '1rem',
-                fontWeight: 600,
-                padding: '10px 14px',
-                cursor: 'pointer'
-              }}
+              className={link.isButton ? 'mobile-connect' : 'mobile-link'}
+              aria-current={isActive ? 'location' : undefined}
+              style={{ color: isActive || link.isButton ? 'var(--accent)' : 'var(--text-primary)', textAlign: isRtl ? 'right' : 'left' }}
             >
               {link.label}
             </button>
-          ))}
-
-          {/* Mobile Socials */}
-          <div
-            style={{
-              display: 'flex',
-              gap: '12px',
-              paddingTop: '14px',
-              borderTop: '1px solid var(--border)',
-              marginTop: '6px'
-            }}
-          >
-            <a
-              href={profileConfig.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="icon-btn"
-              aria-label="GitHub"
-            >
-              <Github size={17} />
-            </a>
-            <a
-              href={profileConfig.linkedinUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="icon-btn"
-              aria-label="LinkedIn"
-            >
-              <Linkedin size={17} />
-            </a>
-            <a
-              href={'mailto:' + profileConfig.email}
-              className="icon-btn"
-              aria-label="Email"
-            >
-              <Mail size={17} />
-            </a>
+            );
+          })}
+          <div className="mobile-lang-row">
+            <span className="mono-label">{t.nav.language}</span>
+            {renderLanguageSwitcher()}
           </div>
         </div>
       )}
 
       <style>{`
+        .lang-switcher {
+          display: inline-flex;
+          align-items: center;
+          gap: 3px;
+          padding: 3px 5px;
+          border-radius: var(--radius-full);
+          border: 1px solid var(--border);
+          background: var(--bg-card);
+        }
+        .lang-switcher button {
+          padding: 3px 7px;
+          border: none;
+          border-radius: var(--radius-full);
+          background: transparent;
+          color: var(--text-muted);
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all var(--transition-fast);
+        }
+        .lang-switcher button:hover { color: var(--accent); }
+        .lang-switcher button.active {
+          background: var(--accent);
+          color: var(--btn-primary-text);
+        }
+        .lang-switcher > span {
+          color: var(--border-hover);
+          font-size: 0.7rem;
+          line-height: 1;
+        }
+        .mobile-lang-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-top: 8px;
+          padding-top: 14px;
+          border-top: 1px solid var(--border-subtle);
+        }
+        .ae-monogram {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 38px;
+          height: 38px;
+          border-radius: 11px;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          color: var(--accent);
+          font-family: var(--font-mono);
+          font-size: 0.9rem;
+          font-weight: 700;
+          letter-spacing: -0.06em;
+          box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.08);
+        }
+        .nav-link {
+          position: relative;
+          background: none;
+          border: none;
+          padding: 6px 0;
+          cursor: pointer;
+          font-family: var(--font-sans);
+          font-weight: 500;
+          font-size: 0.88rem;
+          transition: color var(--transition-fast);
+        }
+        .nav-link:hover { color: var(--accent) !important; }
+        .nav-link-indicator {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: -2px;
+          height: 2px;
+          border-radius: 2px;
+          background: var(--accent);
+        }
+        .nav-connect-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 16px;
+          border-radius: var(--radius-full);
+          border: 1px solid var(--accent);
+          background: transparent;
+          color: var(--accent);
+          font-weight: 600;
+          font-size: 0.84rem;
+          cursor: pointer;
+          transition: all var(--transition-fast);
+        }
+        .nav-connect-btn:hover {
+          background: var(--accent);
+          color: var(--btn-primary-text);
+          box-shadow: var(--shadow-accent);
+        }
+        .mobile-menu {
+          position: absolute;
+          top: 72px;
+          left: 0;
+          right: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          padding: 20px 24px 26px;
+          background: var(--nav-bg);
+          backdrop-filter: blur(16px);
+          border-bottom: 1px solid var(--nav-border);
+          box-shadow: var(--shadow-lg);
+        }
+        .mobile-link, .mobile-connect {
+          background: none;
+          border: none;
+          text-align: left;
+          padding: 10px 0;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+        }
+        .mobile-connect {
+          border: 1px solid var(--accent);
+          border-radius: var(--radius-md);
+          padding: 10px 14px;
+          margin-top: 6px;
+        }
         @media (min-width: 980px) {
-          .desktop-nav {
-            display: flex !important;
-          }
-          .nav-socials {
-            display: flex !important;
-          }
-          .nav-divider {
-            display: block !important;
-          }
+          .desktop-nav { display: flex !important; }
+          .desktop-lang { display: inline-flex !important; }
+          .mobile-toggle { display: none !important; }
         }
         @media (max-width: 979px) {
-          .mobile-toggle {
-            display: inline-flex !important;
-          }
+          .desktop-nav { display: none !important; }
+          .desktop-lang { display: none !important; }
+          .mobile-toggle { display: inline-flex !important; }
+          .mobile-menu { display: flex !important; }
         }
       `}</style>
     </header>

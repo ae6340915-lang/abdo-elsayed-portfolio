@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../hooks/useLanguage';
 
 export const IntroScreen = () => {
-  const [isVisible, setIsVisible] = useState(true);
+  const { t, isRtl } = useLanguage();
+  const [isVisible, setIsVisible] = useState(
+    () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
     // Respect user's motion preferences
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
-      setIsVisible(false);
-      return;
-    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     // Lock page scrolling while intro is displayed
     const originalOverflow = document.body.style.overflow;
@@ -46,12 +46,14 @@ export const IntroScreen = () => {
         position: 'fixed',
         inset: 0,
         zIndex: 99999,
-        backgroundColor: '#0A0F17',
+        backgroundColor: 'var(--bg-primary)',
         backgroundImage: `
-          radial-gradient(circle at 50% 48%, rgba(6, 182, 212, 0.15) 0%, rgba(10, 15, 23, 0.88) 50%, #0A0F17 100%),
-          radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.04) 1px, transparent 0)
+          radial-gradient(circle at 0% 0%, var(--accent-glow) 0%, transparent 36%),
+          radial-gradient(circle at 100% 100%, var(--accent-glow) 0%, transparent 34%),
+          radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--border) 18%, transparent) 1px, transparent 0)
         `,
-        backgroundSize: '100% 100%, 32px 32px',
+        backgroundSize: '100% 100%, 100% 100%, 38px 38px',
+        backgroundPosition: 'center, center, center',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -82,8 +84,8 @@ export const IntroScreen = () => {
             height: 'clamp(110px, 20vw, 140px)',
             borderRadius: '26px',
             overflow: 'hidden',
-            border: '1.5px solid rgba(6, 182, 212, 0.4)',
-            boxShadow: '0 0 30px rgba(6, 182, 212, 0.35), 0 0 70px rgba(59, 130, 246, 0.2)',
+            border: '1.5px solid rgba(var(--accent-rgb), 0.4)',
+            boxShadow: '0 0 30px rgba(var(--accent-rgb), 0.35), 0 0 70px rgba(var(--accent-rgb), 0.2)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -96,7 +98,7 @@ export const IntroScreen = () => {
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'radial-gradient(circle at center, rgba(6, 182, 212, 0.2) 0%, transparent 75%)',
+              background: 'radial-gradient(circle at center, rgba(var(--accent-rgb), 0.2) 0%, transparent 75%)',
               pointerEvents: 'none',
               zIndex: 0
             }}
@@ -129,29 +131,29 @@ export const IntroScreen = () => {
         >
           <div
             style={{
-              fontFamily: 'var(--font-mono, monospace)',
+              fontFamily: isRtl ? 'var(--font-arabic)' : 'var(--font-mono, monospace)',
               fontWeight: 800,
               fontSize: 'clamp(1rem, 2.4vw, 1.25rem)',
-              letterSpacing: '0.18em',
+              letterSpacing: isRtl ? '0' : '0.18em',
               textTransform: 'uppercase',
-              color: '#F8FAFC'
+              color: 'var(--accent)'
             }}
           >
-            Abdo Elsayed<span style={{ color: '#06B6D4' }}>.</span>
+            {t.intro.title}<span style={{ color: 'var(--accent)' }}>.</span>
           </div>
 
           <div
             style={{
-              fontFamily: 'var(--font-mono, monospace)',
+              fontFamily: isRtl ? 'var(--font-arabic)' : 'var(--font-mono, monospace)',
               fontSize: '0.75rem',
               fontWeight: 600,
-              letterSpacing: '0.24em',
+              letterSpacing: isRtl ? '0' : '0.24em',
               textTransform: 'uppercase',
-              color: '#06B6D4',
+              color: 'var(--accent)',
               opacity: 0.9
             }}
           >
-            Data & Machine Learning
+            {t.intro.subtitle}
           </div>
 
           {/* Subtle Accent Glow Line */}
@@ -161,8 +163,8 @@ export const IntroScreen = () => {
               height: '2px',
               width: '48px',
               borderRadius: '1px',
-              background: 'linear-gradient(90deg, #06B6D4, #3B82F6)',
-              boxShadow: '0 0 12px rgba(6, 182, 212, 0.7)',
+              background: 'linear-gradient(90deg, var(--accent), var(--accent-hover))',
+              boxShadow: '0 0 12px rgba(var(--accent-rgb), 0.7)',
               animation: 'introLineGrow 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s backwards'
             }}
           />
@@ -183,14 +185,14 @@ export const IntroScreen = () => {
           }
         }
 
-        @keyframes introCyanAura {
+          @keyframes introCyanAura {
           0%, 100% {
-            box-shadow: 0 0 25px rgba(6, 182, 212, 0.3), 0 0 60px rgba(59, 130, 246, 0.15);
-            border-color: rgba(6, 182, 212, 0.35);
+            box-shadow: 0 0 25px rgba(var(--accent-rgb), 0.3), 0 0 60px rgba(var(--accent-rgb), 0.15);
+            border-color: rgba(var(--accent-rgb), 0.35);
           }
           50% {
-            box-shadow: 0 0 45px rgba(6, 182, 212, 0.55), 0 0 95px rgba(59, 130, 246, 0.3);
-            border-color: rgba(6, 182, 212, 0.7);
+            box-shadow: 0 0 45px rgba(var(--accent-rgb), 0.55), 0 0 95px rgba(var(--accent-rgb), 0.3);
+            border-color: rgba(var(--accent-rgb), 0.7);
           }
         }
 

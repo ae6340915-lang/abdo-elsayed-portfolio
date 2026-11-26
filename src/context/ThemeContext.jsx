@@ -1,32 +1,32 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-
-const ThemeContext = createContext();
+import React, { useEffect, useMemo, useState } from 'react';
+import { ThemeContext } from './themeContextStore';
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('ae_theme');
-    if (saved) return saved;
-    return 'dark'; // dark is primary branding per spec
+    try {
+      const saved = localStorage.getItem('ae_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+    } catch {
+      return 'dark';
+    }
+    return 'dark';
   });
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('ae_theme', theme);
+    try {
+      localStorage.setItem('ae_theme', theme);
+    } catch {
+      return undefined;
+    }
+    return undefined;
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
-  };
+  const toggleTheme = React.useCallback(() => {
+    setTheme((previous) => (previous === 'dark' ? 'light' : 'dark'));
+  }, []);
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
+  const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
 
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) throw new Error('useTheme must be used within a ThemeProvider');
-  return context;
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
